@@ -1,4 +1,4 @@
-![Reyan](http://cgi.cs.arizona.edu/~abureyanahmed/reyan.jpg | width=48)
+<img src="http://cgi.cs.arizona.edu/~abureyanahmed/reyan.jpg" width="48">
 
 ## Reyan Ahmed
 ### Email: abureyanahmed@email.arizona.edu
