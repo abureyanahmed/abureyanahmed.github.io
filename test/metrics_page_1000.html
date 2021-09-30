@@ -16,13 +16,13 @@ let activeQualityMeasures = [
     'gabriel',
 
 ];
-  
 
 function tableCreate(){
     var body = document.body,
         tbl  = document.createElement('table');
     //var plot_folder = "plots/";
-    var plot_folder = "plots_1000/";
+    //var plot_folder = "plots_1000/";
+    var plot_folder = "https://raw.githubusercontent.com/abureyanahmed/gd_hypercube/main/plots/";
     tbl.style.width  = '100px';
     tbl.style.border = '1px solid black';
 
@@ -36,6 +36,11 @@ function tableCreate(){
                 var td = tr.insertCell();
                 var img = document.createElement("img");
                 img.setAttribute('src', plot_folder+activeQualityMeasures[i] + '_vs_' + activeQualityMeasures[j]+".png");
+                img.setAttribute('id', i+','+j);
+		img.onclick = function(event){
+		  location.href = "show_plots.html?id="+this.id;
+                  var id = this.id;
+                }
                 td.appendChild(img);
                 td.style.border = '1px solid black';
             }
@@ -49,3 +54,6 @@ tableCreate();
 
 </body>
 </html>
+
+
+
