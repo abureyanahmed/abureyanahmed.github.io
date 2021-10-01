@@ -1,0 +1,33 @@
+<html>
+<head>
+<title>Dyanmic Networks</title>
+<link rel="stylesheet" href="styles.css">
+<script src="d3.v4.min.js"></script>
+<script src="dynamic_networks.js"></script>
+</head>
+<body>
+<div class="float-container">
+
+  <div class="float-child-left">
+    <div class="green">
+      <textarea id="input_text" name="w3review" rows="4" cols="50">
+        1--2
+        2--3
+        2--4
+      </textarea>
+      <p>Stability:</p>
+      <input type="range" min="1" max="10" value="5" class="slider" id="myRange">
+      <button class="button" onclick="draw()">Draw</button>
+    </div>
+  </div>
+  
+  <div class="float-child">
+    <div class="blue">
+      <svg style="width:100%;height:500px;">
+      </svg>
+    </div>
+  </div>
+  
+</div>
+</body>
+</html>
