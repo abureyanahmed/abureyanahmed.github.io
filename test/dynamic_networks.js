@@ -26,9 +26,9 @@ function draw()
   {
     nodes.push({"id":node_list[i]});
   }
-  console.log(nodes);
 
-  var manyBody = d3.forceManyBody().strength(parseInt(document.getElementById("myRange").value));
+  var rev_scale = d3.scaleLinear().domain([1, 10]).range([10, 1]);
+  var manyBody = d3.forceManyBody().strength(rev_scale(parseInt(document.getElementById("myRange").value)));
   var center = d3.forceCenter().x(width/2).y(height/2);
 
   d3.forceSimulation()
