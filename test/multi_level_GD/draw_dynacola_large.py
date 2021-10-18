@@ -6,20 +6,41 @@ from stress import *
 import json
 
 #output_folder = "dynacola/"
+#output_folder = "dynacola_math/"
+#output_folder = "dynacola_tol/"
 #output_folder = "dynacola_cute/"
 #output_folder = "dynasafe/"
 #output_folder = "dynasafe_cute/"
+#output_folder = "dynasafe_math/"
+#output_folder = "dynasafe_tol/"
 #output_folder = "dagre/"
 #output_folder = "dagre_cute/"
-output_folder = "impred_cute/"
+#output_folder = "dagre_math/"
+#output_folder = "dagre_tol/"
+#output_folder = "dagre_math/"
+output_folder = "radial_math/"
+#output_folder = "radial_tol/"
 f = open(output_folder+"result.json", 'r')
 s = f.read()
 f.close()
 json_obj = json.loads(s)
 
+#node_size = 50-5
+#node_size = 100
+#node_size = 200
+#node_size = 300
+#node_size = 400
+node_size = 495
+#node_size = 499 # for dynasafe
+
+#node_size = 200
+#node_size = 400
+#node_size = 600
+#node_size = 800
+#node_size = 995
 
 time_indices = sorted([int(x) for x in list(json_obj["x_coords"].keys())])
-print(time_indices)
+#print(time_indices)
 
 x_coords = json_obj["x_coords"]
 y_coords = json_obj["y_coords"]
@@ -60,11 +81,25 @@ def draw_graph(x, y, edge_list, id_to_labels, output_file):
 
 edge_list = json_obj["edge_list"]
 
-#'''
+crd_x = x_coords[str(node_size)]
+crd_y = y_coords[str(node_size)]
+
+
+edge_list2 = []
+for e in edge_list:
+  u, v = e["source"]["index"], e["target"]["index"]
+  u, v = str(u), str(v)
+  if u not in crd_x.keys() or v not in crd_x.keys():
+    continue
+  edge_list2.append(e)
+edge_list = edge_list2
+
+
+'''
 print("x_coords[\"9\"]", x_coords["9"])
 print("y_coords[\"9\"]", y_coords["9"])
 print("edge_list[:9]", edge_list[:9])
-#'''
+'''
 
 id_to_labels = json_obj["id_to_label"]
 '''
@@ -84,7 +119,8 @@ for t in time_indices:
 
 gs = 0
 gc = 0
-for node in x_coords[str(time_indices[-1])]:
+for node in x_coords[str(node_size)]:
+#for node in x_coords[str(time_indices[-1])]:
   s = 0
   c = 0
   for t in time_indices:
@@ -97,18 +133,23 @@ for node in x_coords[str(time_indices[-1])]:
 
 #print("Instability:", gs/gc)
 
-#scale = 6.25 # dynacola
+#scale = 1.7 # dynacola large
 #scale = 4.0 # dynacola
 #scale = 0.10 # dynacola
-#scale = 7.0 # dynacola large
-#scale = 0.03525 # dynasafe
+#scale = 0.09 # dynasafe large
+#scale = 0.01 # dynasafe large 100
+#scale = 0.09 # dynasafe large 499
 #scale = 0.12 # dynasafe after convergence
 #scale = 0.14 # dynasafe after convergence
-#scale = 0.11 # dynasafe large
-scale = 16.0 # dagre
+#scale = 0.11 # dynasafe
+#scale = 7.0 # dagre large
+scale = 0.00001 
+last_time = str(node_size)
+'''
 last_time = str(time_indices[-1])
 crd_x = x_coords[last_time]
 crd_y = y_coords[last_time]
+'''
 label_len = dict()
 label_area = 0
 for u in crd_x.keys():
@@ -131,7 +172,7 @@ def doOverlap(l1_x, l1_y, r1_x, r1_y, l2_x, l2_y, r2_x, r2_y):
 
           return True
 
-#'''
+'''
 node_lst = list(crd_x.keys())
 for i, node_i in enumerate(node_lst):
     for j2, node_j in enumerate(node_lst[i+1:]):
@@ -148,13 +189,17 @@ for i, node_i in enumerate(node_lst):
         if doOverlap(l1_x, l1_y, r1_x, r1_y, l2_x, l2_y, r2_x, r2_y):
           print("overlap found!")
           quit()
-#'''
+'''
 
 #print("Compactness:", label_area/total_area)
 print("Compactness:", total_area/label_area)
 
 G = nx.Graph()
 for e in edge_list:
+  u, v = e["source"]["index"], e["target"]["index"]
+  u, v = str(u), str(v)
+  if u not in crd_x.keys() or v not in crd_x.keys():
+    continue
   #G.add_edge(e["source"]["id"], e["target"]["id"])
   G.add_edge(e["source"]["index"], e["target"]["index"])
 for u in G.nodes():
@@ -207,16 +252,6 @@ print("DEL", ideal_edge_length_preservation(edge_list, edge_distance))
 
 print("Stress", stress(G))
 
-#centralize
-for t in time_indices:
-  lmax_x, lmax_y, lmin_x, lmin_y = x_coords[str(t)]['0'], y_coords[str(t)]['0'], x_coords[str(t)]['0'], y_coords[str(t)]['0']
-  for k in x_coords[str(t)]:
-    lmax_x, lmax_y, lmin_x, lmin_y = max(lmax_x, x_coords[str(t)][k]), max(lmax_y, y_coords[str(t)][k]), min(lmin_x, x_coords[str(t)][k]), min(lmin_y, y_coords[str(t)][k])
-  cx = (lmax_x+lmin_x)/2
-  cy = (lmax_y+lmin_y)/2
-  for k in x_coords[str(t)]:
-    x_coords[str(t)][k], y_coords[str(t)][k] = x_coords[str(t)][k]-cx, y_coords[str(t)][k]-cy
-
 #'''
 max_id = dict()
 max_x, max_y, min_x, min_y = x_coords['0']['0'], y_coords['0']['0'], x_coords['0']['0'], y_coords['0']['0']
@@ -233,8 +268,7 @@ for t in time_indices:
     if min_y>y_coords[str(t)][k]:
       min_y = y_coords[str(t)][k]
     max_id[t] = max(int(k), max_id[t])
-print("max_x, max_y, min_x, min_y", max_x, max_y, min_x, min_y)
-print("width, height", (max_x-min_x), (max_y-min_y))
+#print("max_x, max_y, min_x, min_y", max_x, max_y, min_x, min_y)
 x_border = (max_x-min_x)*.1
 max_x += x_border
 min_x -= x_border

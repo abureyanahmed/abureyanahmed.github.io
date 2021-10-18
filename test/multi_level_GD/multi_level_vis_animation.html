@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- <script src="lastfm_data.js"></script> -->
+<!-- <script src="topics_data.js"></script> -->
+<!-- <script src="DynNoSlice_cute/graph_15.js"></script> -->
+<!-- <script src="DynNoSlice_cute/graph_25.js"></script> -->
+<!-- <script src="DynNoSlice_cute/graph_35.js"></script> -->
+<!-- <script src="DynNoSlice_cute/graph_45.js"></script> -->
+<!-- <script src="DynNoSlice_cute/graph_50.js"></script> -->
+<!-- <script src="DynNoSlice_tol/graph_500.js"></script> -->
+<!-- <script src="DynNoSlice_tol/graph_100.js"></script> -->
+<!-- <script src="dynagraph_cute/graph_15.js"></script> -->
+<!-- <script src="dynagraph_cute/graph_25.js"></script> -->
+<!-- <script src="dynagraph_cute/graph_35.js"></script> -->
+<!-- <script src="dynagraph_cute/graph_45.js"></script> -->
+<!-- <script src="dynagraph_cute/graph_49.js"></script> -->
+<!-- <script src="dynagraph_math/graph_100.js"></script> -->
+<!-- <script src="dynagraph_tol/graph_490.js"></script> -->
+<!-- <script src="dagre_cute/graph_12.js"></script> -->
+<!-- <script src="dagre_cute/graph_22.js"></script> -->
+<!-- <script src="dagre_cute/graph_32.js"></script> -->
+<!-- <script src="dagre_cute/graph_42.js"></script> -->
+<!-- <script src="dagre_cute/graph_47.js"></script> -->
+<!-- <script src="dagre_tol/graph_490.js"></script> -->
+<!-- <script src="dagre_math/graph_300.js"></script> -->
+<!-- <script src="dynacola_cute/graph_25.js"></script> -->
+<!-- <script src="dynacola_cute/graph_45.js"></script> -->
+<!-- <script src="dynacola_cute/graph_65.js"></script> -->
+<!-- <script src="dynacola_cute/graph_85.js"></script> -->
+<!-- <script src="dynacola_cute/graph_97.js"></script> -->
+<!-- <script src="dynacola_tol/graph_2.js"></script> -->
+<!-- <script src="dynasafe_cute/graph_9.js"></script> -->
+<!-- <script src="dynasafe_cute/graph_19.js"></script> -->
+<!-- <script src="dynasafe_cute/graph_29.js"></script> -->
+<!-- <script src="dynasafe_cute/graph_39.js"></script> -->
+<!-- <script src="dynasafe_cute/graph_49.js"></script> -->
+<!-- <script src="dynasafe_tol/graph_490.js"></script> -->
+<!-- <script src="radial_tol/graph_4.js"></script> -->
+<!-- <script src="radial_math/graph_4.js"></script> -->
+<!-- <script src="lastfm_coordinates.js"></script> -->
+<!-- <script src="topics_coordinates.js"></script> -->
+<!-- <script src="DynNoSlice_cute/coordinates_15.js"></script> -->
+<!-- <script src="DynNoSlice_cute/coordinates_25.js"></script> -->
+<!-- <script src="DynNoSlice_cute/coordinates_35.js"></script> -->
+<!-- <script src="DynNoSlice_cute/coordinates_45.js"></script> -->
+<!-- <script src="DynNoSlice_cute/coordinates_50.js"></script> -->
+<!-- <script src="DynNoSlice_tol/coordinates_500.js"></script> -->
+<!-- <script src="DynNoSlice_tol/coordinates_100.js"></script> -->
+<!-- <script src="dynagraph_cute/coordinates_15.js"></script> -->
+<!-- <script src="dynagraph_cute/coordinates_25.js"></script> -->
+<!-- <script src="dynagraph_cute/coordinates_35.js"></script> -->
+<!-- <script src="dynagraph_cute/coordinates_45.js"></script> -->
+<!-- <script src="dynagraph_cute/coordinates_49.js"></script> -->
+<!-- <script src="dynagraph_math/coordinates_100.js"></script> -->
+<!-- <script src="dynagraph_tol/coordinates_490.js"></script> -->
+<!-- <script src="dagre_cute/coordinates_12.js"></script> -->
+<!-- <script src="dagre_cute/coordinates_22.js"></script> -->
+<!-- <script src="dagre_cute/coordinates_32.js"></script> -->
+<!-- <script src="dagre_cute/coordinates_42.js"></script> -->
+<!-- <script src="dagre_cute/coordinates_47.js"></script> -->
+<!-- <script src="dagre_tol/coordinates_490.js"></script> -->
+<!-- <script src="dagre_math/coordinates_300.js"></script> -->
+<!-- <script src="dynacola_cute/coordinates_25.js"></script> -->
+<!-- <script src="dynacola_cute/coordinates_45.js"></script> -->
+<!-- <script src="dynacola_cute/coordinates_65.js"></script> -->
+<!-- <script src="dynacola_cute/coordinates_85.js"></script> -->
+<!-- <script src="dynacola_cute/coordinates_97.js"></script> -->
+<!-- <script src="dynacola_tol/coordinates_2.js"></script> -->
+<!-- <script src="dynasafe_cute/coordinates_9.js"></script> -->
+<!-- <script src="dynasafe_cute/coordinates_19.js"></script> -->
+<!-- <script src="dynasafe_cute/coordinates_29.js"></script> -->
+<!-- <script src="dynasafe_cute/coordinates_39.js"></script> -->
+<!-- <script src="dynasafe_cute/coordinates_49.js"></script> -->
+<!-- <script src="dynasafe_tol/coordinates_490.js"></script> -->
+<!-- <script src="radial_tol/coordinates_4.js"></script> -->
+<!-- <script src="radial_math/coordinates_4.js"></script> -->
+<script src="dynasafe_cute/nodes_50.js"></script>
+</head>
+<body>
+<div id="main_div">
+<canvas id="myCanvas" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+</div>
+<div id="button_div">
+<div id="top_div" style="float:left;">
+<button type="button" onclick="mytop()">Top</button>
+<!-- <button type="button" onclick="mybot()">Bottom</button> -->
+</div>
+<div id="zoom_div">
+<!--<table cellspacing="0" cellpadding="0" style="border:none;float:left;">
+  <tr>
+    <td class="first"><button type="button" onclick="zoom_nw()">Zoom NW</button></td>
+    <td class="first"><button type="button" onclick="zoom_ne()">Zoom NE</button></td>
+  </tr>
+  <tr>
+    <td class="second"><button type="button" onclick="zoom_sw()">Zoom SW</button></td>
+    <td class="second"><button type="button" onclick="zoom_se()">Zoom SE</button></td>
+  </tr>
+</table>-->
+<button type="button" onclick="initialize_coordinates(2);ctx.clearRect(0, 0, c.width, c.height);mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);">Zoom in</button>
+<button type="button" onclick="initialize_coordinates(.5);ctx.clearRect(0, 0, c.width, c.height);mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);">Zoom out</button>
+<br>
+<button type="button" onclick="ctx.clearRect(0, 0, c.width, c.height);mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);">Show label</button>
+<button type="button" onclick="ctx.clearRect(0, 0, c.width, c.height);mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, false);">Hide label</button>
+</div>
+<div id="position_div" style="float:right;">
+<table cellspacing="0" cellpadding="0" style="border:none;">
+  <tr>
+    <td class="first"></td>
+    <td class="first"><button type="button" onclick="move_up()">Up</button></td>
+    <td class="first"></td>
+  </tr>
+  <tr>
+    <td class="second"><button type="button" onclick="move_left()">Left</button></td>
+    <td class="second"></td>
+    <td class="second"><button type="button" onclick="move_right()">Right</button></td>
+  </tr>
+  <tr>
+    <td class="third"></td>
+    <td class="third"><button type="button" onclick="move_down()">Down</button></td>
+    <td class="third"></td>
+  </tr>
+</table>
+</div>
+</div>
+<script>
+var script_iter = 2;
+var script_iter_end = 490;
+//var script_iter_end = 990;
+//var folder_name = "DynNoSlice_math";
+//var folder_name = "DynNoSlice_tol";
+//var folder_name = "dynagraph_math";
+//var folder_name = "dynagraph_tol";
+//var folder_name = "dagre_math";
+//var folder_name = "dagre_tol";
+//var folder_name = "dynasafe_math";
+//var folder_name = "dynasafe_tol";
+//var folder_name = "dynacola_math";
+//var folder_name = "dynacola_tol";
+//var folder_name = "radial_math";
+var folder_name = "radial_tol";
+var script_graph = null;
+var script_coord = null;
+function load_scripts(){
+  script_graph = document.createElement('script');
+  script_coord = document.createElement('script');
+  script_coord.onload = function() {
+    //alert("Coordinate script loaded and ready");
+    find_max_and_min();
+    ctx.clearRect(0, 0, c.width, c.height);
+    mydraw(current_length, canvas_width, canvas_height, cur_cntr_x, cur_cntr_y, false);
+    script_iter++;
+    if(script_iter>script_iter_end){
+      stopLoadingScripts();
+    }
+  };
+  script_graph.onload = function() {
+    //alert("Graph script loaded and ready");
+    script_coord.src = folder_name + "/coordinates_"+script_iter+".js";
+    document.getElementsByTagName('head')[0].appendChild(script_coord);
+  };
+  script_graph.src = folder_name + "/graph_"+script_iter+".js";
+  document.getElementsByTagName('head')[0].appendChild(script_graph);
+}
+var intervalTime = 40;
+//var intervalTime = 20;
+var loadScriptInterval = setInterval(load_scripts, intervalTime);
+
+function stopLoadingScripts() {
+  clearInterval(loadScriptInterval);
+}
+
+/*
+var my_edges =  [['algorithmic ', 'approximatio']];
+var label_to_id = {'algorithmic ':0, 'approximatio':1};
+var id_to_label = {0:'algorithmic ', 1:'approximatio'};
+var edge_distance = {0:150};
+var coordinates=[{id:0, name:"algorithmic ", x:100, y:100}, {id:1, name:"approximatio", x:200, y:200}];
+*/
+//var my_edges = [['Shokichi Iyanaga', 'Michio Kuga 1161'], ['Bruce Allen Dods', 'Michio Kuga 1161'], ['Stephen S. Kudla', 'Michio Kuga 1161'], ['Kenjiro Shoda 11', 'Takayuki Tamura '], ['Teiji Takagi 556', 'Sigekatu Kuroda '], ['Stephen Virgil U', 'Sigekatu Kuroda '], ['Ott-Heinrich Kel', 'Joachim Piehler '], ['Shokichi Iyanaga', 'Satoru Takasu 13'], ['Masahiko Sato 90', 'Satoru Takasu 13'], ['Teiji Takagi 556', 'Hiroshi Uehara 4'], ['Franklin Stauffe', 'Hiroshi Uehara 4'], ['Volker Baumann 2', 'Ruth Moufang 342'], ['Josef Weier 4839', 'Ruth Moufang 342'], ['Rolf Schneider 1', 'Ruth Moufang 342'], ['Max Wilhelm Dehn', 'Ruth Moufang 342'], ['Wolfgang Vogel 3', 'Ott-Heinrich Kel'], ['Gerhard Pazdersk', 'Ott-Heinrich Kel'], ['Reiner Fritzsche', 'Ott-Heinrich Kel'], ['Max Wilhelm Dehn', 'Ott-Heinrich Kel'], ['Otto Krötenheerd', 'Ott-Heinrich Kel'], ['Wilhelm Magnus 1', 'Herbert Bishop K'], ['Wilhelm Magnus 1', 'Ruth Rebekka Str'], ['Shokichi Iyanaga', 'Ichiro Tamura 13'], ['Otto Eduard Neug', 'Bernard Raphael '], ['Tadasi Nakayama ', 'Masayoshi Nagata'], ['David Edwin Ping', 'Kim Leslie Plofk'], ['Goro Azumaya 943', 'Shokichi Iyanaga'], ['Teiji Takagi 556', 'Shokichi Iyanaga'], ['Yukiyoshi Kawada', 'Shokichi Iyanaga'], ['Yozo Matsushima ', 'Kenjiro Shoda 11'], ['Masatoshi Gunduz', 'Kenjiro Shoda 11'], ['Teiji Takagi 556', 'Kenjiro Shoda 11'], ['Wilhelm Magnus 1', 'Friedrich Wilhel'], ['Otto Eduard Neug', 'David Edwin Ping'], ['Teiji Takagi 556', 'Tadasi Nakayama '], ['Goro Azumaya 943', 'James Michael Os'], ['Wilhelm Magnus 1', 'Jacques Lewin 13'], ['Yukiyoshi Kawada', 'Satoshi Arima 12'], ['Otto Eduard Neug', 'Asger Hartvig Aa'], ['Wilhelm Magnus 1', 'Donald Solitar 1'], ['Teiji Takagi 556', 'David Hilbert 72'], ['Otto Blumenthal ', 'David Hilbert 72'], ['Earle Raymond He', 'David Hilbert 72'], ['Otto Eduard Neug', 'David Hilbert 72'], ['Max Wilhelm Dehn', 'David Hilbert 72'], ['Edgar Jerome Tow', 'David Hilbert 72'], ['John Allen Beach', 'Goro Azumaya 943'], ['Jakob Dondorff 1', 'Otto Blumenthal '], ['Max Wilhelm Dehn', 'Wilhelm Magnus 1']];
+
+//my_edges = my_edges.slice(0, my_edges.length-1);
+
+/*
+let canvas_width = 1200;
+let canvas_height = 700;
+let drawing_width = 1200;
+let drawing_height = 700;
+*/
+let canvas_width = 600;
+let canvas_height = 600;
+let drawing_width = 600;
+let drawing_height = 600;
+//let drawing_width = 2400;
+//let drawing_height = 1400;
+let cur_cntr_x = 0;
+let cur_cntr_y = 0;
+let edge_diff = 100;
+let translate_cntr_x = {"east":-canvas_width, "west":0};
+let translate_cntr_y = {"north":0, "south":-canvas_height};
+let zoom_factor = 1;
+let dir_x = [];
+let dir_y = [];
+let cur_level = 1;
+
+function draw_line(ctx, x1, y1, x2, y2)
+{
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
+
+function draw_circle(radius, ctx, x1, y1)
+{
+      //radius = 3
+      ctx.beginPath();
+      ctx.arc(x1, y1, radius/2, 0, 2 * Math.PI, false);
+      //ctx.fillStyle = 'green';
+      ctx.fillStyle = 'black';
+      ctx.fill();
+      //ctx.lineWidth = 5;
+      //ctx.strokeStyle = '#003300';
+      ctx.strokeStyle = '#000000';
+      ctx.stroke();
+}
+
+//function transform(x, x_range, screen_width, min_x, shift){return ((x-min_x)*screen_width/x_range)+shift;}
+//function transform(x, x_range, screen_width, min_x, shift){return (x*screen_width/x_range);}
+function transform(x, x_range, screen_width, min_x, shift){return x;}
+
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+ctx.canvas.width  = canvas_width;
+ctx.canvas.height  = canvas_height;
+document.getElementById("button_div").style = "width:"+canvas_width+"px;" + document.getElementById("position_div").style;
+var max_x = 0;
+var max_y = 0;
+var min_x = 0;
+var min_y = 0;
+function find_max_and_min()
+{
+  var max_x = coordinates[0].x;
+  var max_y = coordinates[0].y;
+  var min_x = coordinates[0].x;
+  var min_y = coordinates[0].y;
+  for(var i=0; i<coordinates.length; i++)
+  {
+    if(max_x<coordinates[i].x)max_x = coordinates[i].x;
+    if(max_y<coordinates[i].y)max_y = coordinates[i].y;
+    if(min_x>coordinates[i].x)min_x = coordinates[i].x;
+    if(min_y>coordinates[i].y)min_y = coordinates[i].y;
+  }
+  for(var i=0; i<coordinates.length; i++)
+  { 
+    coordinates[i].x -= (max_x+min_x)/2;
+    coordinates[i].y -= (max_y+min_y)/2;
+  }
+  for(var i=0; i<coordinates.length; i++)
+  { 
+    coordinates[i].x *= canvas_width/(max_x-min_x);
+    coordinates[i].y *= canvas_height/(max_y-min_y);
+  }
+  //let dif_x = canvas_width/2 - (max_x-min_x)/2;
+  //let dif_y = canvas_height/2 - (max_y-min_y)/2;
+  //console.log("dif_x", dif_x, "dif_y", dif_y);
+  for(var i=0; i<coordinates.length; i++)
+  {
+    coordinates[i].x += canvas_width/2;
+    coordinates[i].y += canvas_height/2;
+  }
+}
+/*
+for(var i=0; i<coordinates.length; i++)
+{
+  coordinates[i].x -= dif_x;
+  coordinates[i].y -= dif_y;
+}
+console.log(coordinates);
+for(var i=0; i<coordinates.length; i++)
+{
+  coordinates[i].x *= canvas_width/(max_x-min_x);
+  coordinates[i].y *= canvas_height/(max_y-min_y);
+}
+console.log(coordinates);
+*/
+//current_length = 50;
+//current_length = 250;
+//current_length = 100;
+//max_level = 2;
+current_length = 150;
+max_level = 3;
+function initialize_coordinates(scale_factor)
+{
+  var max_x = coordinates[0].x;
+  var max_y = coordinates[0].y;
+  var min_x = coordinates[0].x;
+  var min_y = coordinates[0].y;
+  for(var i=0; i<coordinates.length; i++)
+  { 
+    if(max_x<coordinates[i].x)max_x = coordinates[i].x;
+    if(max_y<coordinates[i].y)max_y = coordinates[i].y;
+    if(min_x>coordinates[i].x)min_x = coordinates[i].x;
+    if(min_y>coordinates[i].y)min_y = coordinates[i].y;
+  }
+  for(var i=0; i<coordinates.length; i++)
+  { 
+    coordinates[i].x -= (max_x+min_x)/2;
+    coordinates[i].y -= (max_y+min_y)/2;
+  }
+
+  for(var i=0; i<coordinates.length; i++)
+  {
+    coordinates[i].x *= scale_factor;
+    coordinates[i].y *= scale_factor;
+  }
+
+  for(var i=0; i<coordinates.length; i++)
+  {
+    coordinates[i].x += canvas_width/2;
+    coordinates[i].y += canvas_height/2;
+  }
+}
+function get_label_dictionary(screen_width, screen_height, shift_x, shift_y, eps)
+{
+  let label_to_coord = {};
+  for(var i=0; i<my_edges.length; i++)
+  {
+    //console.log(i, my_edges[i], my_edges[i][0], label_to_id[my_edges[i][0]]);
+    var n1 = label_to_id[my_edges[i][0]];
+    var n2 = label_to_id[my_edges[i][1]];
+    //if((!(n1 in coordinates))||(!(n2 in coordinates)))continue;
+    //console.log(n1, coordinates[n1]);
+    //console.log(coordinates[n1].x);
+    var x1 = coordinates[n1].x;
+    x1 = transform(x1, max_x-min_x, screen_width*drawing_width/canvas_width, min_x, shift_x);
+    var y1 = coordinates[n1].y;
+    y1 = transform(y1, max_y-min_y, screen_height*drawing_height/canvas_height, min_y, shift_y);
+    if(my_edges[i][0] in label_to_coord)
+      y1 = label_to_coord[my_edges[i][0]];
+    var x2 = coordinates[n2].x;
+    x2 = transform(x2, max_x-min_x, screen_width*drawing_width/canvas_width, min_x, shift_x);
+    var y2 = coordinates[n2].y;
+    y2 = transform(y2, max_y-min_y, screen_height*drawing_height/canvas_height, min_y, shift_y);
+    if(my_edges[i][1] in label_to_coord)
+      y2 = label_to_coord[my_edges[i][1]];
+    if(Math.abs(y1-y2)<eps)
+      y2 = y2+eps;
+    if(!(my_edges[i][0] in label_to_coord))
+      label_to_coord[my_edges[i][0]]=y1;
+    if(!(my_edges[i][1] in label_to_coord))
+      label_to_coord[my_edges[i][1]]=y2;
+  }
+  return label_to_coord;
+}
+///*
+function mydraw(edge_len, screen_width, screen_height, shift_x, shift_y, show_label)
+{
+  let label_to_coord = get_label_dictionary(screen_width, screen_height, shift_x, shift_y, 10);
+  let already_shown = {}
+  for(var i=0; i<my_edges.length-1; i++)
+  //for(var i=0; i<my_edges.length; i++)
+  {
+    if(edge_distance[i]<edge_len)continue;
+    var n1 = label_to_id[my_edges[i][0]];
+    var n2 = label_to_id[my_edges[i][1]];
+    //if((!(n1 in coordinates))||(!(n2 in coordinates)))continue;
+    //if((!(my_edges[i][0] in cur_nodes))||(!(my_edges[i][1] in cur_nodes)))continue;
+    //if((n1==10)||(n2==10))continue;
+    var x1 = coordinates[n1].x;
+    x1 = transform(x1, max_x-min_x, screen_width*drawing_width/canvas_width, min_x, shift_x);
+    var y1 = coordinates[n1].y;
+    y1 = transform(y1, max_y-min_y, screen_height*drawing_height/canvas_height, min_y, shift_y);
+    var x2 = coordinates[n2].x;
+    x2 = transform(x2, max_x-min_x, screen_width*drawing_width/canvas_width, min_x, shift_x);
+    var y2 = coordinates[n2].y;
+    y2 = transform(y2, max_y-min_y, screen_height*drawing_height/canvas_height, min_y, shift_y);
+    draw_line(ctx, x1, y1, x2, y2);
+    //if(node_weights[my_edges[i][0]]>=edge_len)
+    //  ctx.fillText(my_edges[i][0], x1-15, y1);
+    //if(node_weights[my_edges[i][1]]>=edge_len)
+    //  ctx.fillText(my_edges[i][1], x2-15, y2);
+    if(show_label)
+    {
+      if(!(my_edges[i][0] in already_shown))
+      {
+        ctx.fillText(my_edges[i][0], x1-15, label_to_coord[my_edges[i][0]]);
+        already_shown[my_edges[i][0]] = true;
+      }
+      if(!(my_edges[i][1] in already_shown))
+      {
+        ctx.fillText(my_edges[i][1], x2-15, label_to_coord[my_edges[i][1]]);
+        already_shown[my_edges[i][1]] = true;
+      }
+    }
+    else
+    {
+      radius = 3;
+      draw_circle(radius, ctx, x1, y1);
+      draw_circle(radius, ctx, x2, y2);
+    }
+  }
+  //for(n in cur_nodes)
+  //{
+  //  if(show_label&&(!(n in already_shown)))
+  //  {
+  //    console.log("missing", n);
+  //  }
+  //}
+}
+//*/
+/*
+function mydraw(edge_len, screen_width, screen_height, shift_x, shift_y, show_label)
+{
+  let label_to_coord = get_label_dictionary(screen_width, screen_height, shift_x, shift_y, 10);
+  let already_shown = {}
+  for(var i=0; i<my_edges.length; i++)
+  {
+    //console.log(i, "top");
+    //console.log(my_edges[i])
+    if(edge_distance[i]<edge_len)continue;
+    var n1 = label_to_id[my_edges[i][0]];
+    var n2 = label_to_id[my_edges[i][1]];
+    //if((!(n1 in coordinates))||(!(n2 in coordinates)))continue;
+    //if((!(my_edges[i][0] in cur_nodes))||(!(my_edges[i][1] in cur_nodes)))continue;
+    //if((i%2==0)&&((!(my_edges[i][1] in cur_nodes))||(!(my_edges[i+1][0] in cur_nodes))))
+    //{
+    //  i++;
+    //  continue;
+    //}
+    //if((n1==10)||(n2==10))continue;
+    var x1 = coordinates[n1].x;
+    x1 = transform(x1, max_x-min_x, screen_width*drawing_width/canvas_width, min_x, shift_x);
+    var y1 = coordinates[n1].y;
+    y1 = transform(y1, max_y-min_y, screen_height*drawing_height/canvas_height, min_y, shift_y);
+    var x2 = coordinates[n2].x;
+    x2 = transform(x2, max_x-min_x, screen_width*drawing_width/canvas_width, min_x, shift_x);
+    var y2 = coordinates[n2].y;
+    y2 = transform(y2, max_y-min_y, screen_height*drawing_height/canvas_height, min_y, shift_y);
+    draw_line(ctx, x1, y1, x2, y2);
+    if(show_label)
+    {
+      if(!(my_edges[i][0] in already_shown))
+      {
+        ctx.fillText(my_edges[i][0], x1-15, label_to_coord[my_edges[i][0]]);
+        already_shown[my_edges[i][0]] = true;
+      }
+      if(!(my_edges[i][1] in already_shown))
+      {
+        ctx.fillText(my_edges[i][1], x2-15, label_to_coord[my_edges[i][1]]);
+        already_shown[my_edges[i][1]] = true;
+      }
+    }
+    else
+    {
+      radius = 3
+      draw_circle(radius/2, ctx, x1, y1);
+      draw_circle(radius, ctx, x2, y2);
+    }
+    i++;
+    //console.log(i, "bottom");
+    //console.log(my_edges[i]);
+    var n1 = label_to_id[my_edges[i][0]];
+    var n2 = label_to_id[my_edges[i][1]];
+    //if((!(n1 in coordinates))||(!(n2 in coordinates)))continue;
+    //if((!(my_edges[i][0] in cur_nodes))||(!(my_edges[i][1] in cur_nodes)))continue;
+    //if((i%2==0)&&((!(my_edges[i][1] in cur_nodes))||(!(my_edges[i+1][0] in cur_nodes))))continue;
+    //if((n1==10)||(n2==10))continue;
+    var x1 = coordinates[n1].x;
+    x1 = transform(x1, max_x-min_x, screen_width*drawing_width/canvas_width, min_x, shift_x);
+    var y1 = coordinates[n1].y;
+    y1 = transform(y1, max_y-min_y, screen_height*drawing_height/canvas_height, min_y, shift_y);
+    var x2 = coordinates[n2].x;
+    x2 = transform(x2, max_x-min_x, screen_width*drawing_width/canvas_width, min_x, shift_x);
+    var y2 = coordinates[n2].y;
+    y2 = transform(y2, max_y-min_y, screen_height*drawing_height/canvas_height, min_y, shift_y);
+    draw_line(ctx, x1, y1, x2, y2);
+    if(show_label)
+    {
+      if(!(my_edges[i][0] in already_shown))
+      {
+        ctx.fillText(my_edges[i][0], x1-15, label_to_coord[my_edges[i][0]]);
+        already_shown[my_edges[i][0]] = true;
+      }
+      if(!(my_edges[i][1] in already_shown))
+      {
+        ctx.fillText(my_edges[i][1], x2-15, label_to_coord[my_edges[i][1]]);
+        already_shown[my_edges[i][1]] = true;
+      }
+    }
+    else
+    {
+      radius = 3
+      draw_circle(radius, ctx, x1, y1);
+      draw_circle(radius/2, ctx, x2, y2);
+    }
+  }
+  //for(n in cur_nodes)
+  //{
+  //  if(show_label&&(!(n in already_shown)))
+  //  {
+  //    console.log("missing", n);
+  //  }
+  //}
+}
+*/
+
+//mydraw(current_length, canvas_width, canvas_height, cur_cntr_x, cur_cntr_y, true);
+//mydraw(current_length, canvas_width, canvas_height, cur_cntr_x, cur_cntr_y, false);
+
+/*function move_right()
+{ 
+  cur_cntr_x = cur_cntr_x - 100;
+  ctx.clearRect(0, 0, c.width, c.height);
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+}
+function move_left()
+{ 
+  cur_cntr_x = cur_cntr_x + 100;
+  ctx.clearRect(0, 0, c.width, c.height);
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+}
+function move_up()
+{ 
+  cur_cntr_y = cur_cntr_y + 100;
+  ctx.clearRect(0, 0, c.width, c.height);
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+}
+function move_down()
+{ 
+  cur_cntr_y = cur_cntr_y - 100;
+  ctx.clearRect(0, 0, c.width, c.height);
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+}*/
+
+function move_right()
+{
+  for(var i=0; i<coordinates.length; i++)
+  { 
+    coordinates[i].x -= 100;
+  }
+  ctx.clearRect(0, 0, c.width, c.height);
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+}
+function move_left()
+{
+  for(var i=0; i<coordinates.length; i++)
+  { 
+    coordinates[i].x += 100;
+  }
+  ctx.clearRect(0, 0, c.width, c.height);
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+}
+function move_up()
+{
+  for(var i=0; i<coordinates.length; i++)
+  { 
+    coordinates[i].y += 100;
+  }
+  ctx.clearRect(0, 0, c.width, c.height);
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+}
+function move_down()
+{
+  for(var i=0; i<coordinates.length; i++)
+  { 
+    coordinates[i].y -= 100;
+  }
+  ctx.clearRect(0, 0, c.width, c.height);
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+}
+
+function my_toggle_Function() {
+  var x = document.getElementById("top_div");
+  if (cur_level != 1) {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var x = document.getElementById("zoom_div");
+  if (cur_level != max_level) {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+document.getElementById("top_div").style.display = "none";
+function mytop()
+{
+  cur_level = cur_level - 1;
+  zoom_factor = zoom_factor/2;
+  if(current_length<250)current_length = current_length + edge_diff;
+  ctx.clearRect(0, 0, c.width, c.height);
+  cur_cntr_x = cur_cntr_x - translate_cntr_x[dir_x[dir_x.length-1]];
+  cur_cntr_y = cur_cntr_y - translate_cntr_y[dir_y[dir_y.length-1]];
+  dir_x.pop();
+  dir_y.pop();
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+  my_toggle_Function();
+}
+function mybot()
+{
+  if(current_length>50)current_length = current_length - edge_diff;
+  ctx.clearRect(0, 0, c.width, c.height);
+  //mydraw(current_length, canvas_width, canvas_height, cur_cntr_x, cur_cntr_y, true);
+}
+function zoom_nw()
+{
+  cur_level = cur_level + 1;
+  dir_x.push("west");
+  dir_y.push("north");
+  zoom_factor = zoom_factor*2;
+  if(current_length>50)current_length = current_length - edge_diff;
+  ctx.clearRect(0, 0, c.width, c.height);
+  cur_cntr_x = cur_cntr_x+translate_cntr_x["west"];
+  cur_cntr_y = cur_cntr_y+translate_cntr_y["north"];
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+  my_toggle_Function();
+}
+function zoom_sw()
+{
+  cur_level = cur_level + 1;
+  dir_x.push("west");
+  dir_y.push("south");
+  zoom_factor = zoom_factor*2;
+  if(current_length>50)current_length = current_length - edge_diff;
+  ctx.clearRect(0, 0, c.width, c.height);
+  cur_cntr_x = cur_cntr_x+translate_cntr_x["west"];
+  cur_cntr_y = cur_cntr_y+translate_cntr_y["south"];
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+  my_toggle_Function();
+}
+function zoom_ne()
+{
+  cur_level = cur_level + 1;
+  dir_x.push("east");
+  dir_y.push("north");
+  zoom_factor = zoom_factor*2;
+  if(current_length>50)current_length = current_length - edge_diff;
+  ctx.clearRect(0, 0, c.width, c.height);
+  cur_cntr_x = cur_cntr_x+translate_cntr_x["east"];
+  cur_cntr_y = cur_cntr_y+translate_cntr_y["north"];
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+  my_toggle_Function();
+}
+function zoom_se()
+{
+  cur_level = cur_level + 1;
+  dir_x.push("east");
+  dir_y.push("south");
+  zoom_factor = zoom_factor*2;
+  if(current_length>50)current_length = current_length - edge_diff;
+  ctx.clearRect(0, 0, c.width, c.height);
+  cur_cntr_x = cur_cntr_x+translate_cntr_x["east"];
+  cur_cntr_y = cur_cntr_y+translate_cntr_y["south"];
+  mydraw(current_length, zoom_factor*canvas_width, zoom_factor*canvas_height, cur_cntr_x, cur_cntr_y, true);
+  my_toggle_Function();
+}
+</script>
+</body>
+</html>
+
