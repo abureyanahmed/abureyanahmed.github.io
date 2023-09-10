@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="d3.v4.min.js"></script>
+<style>
+
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+.button1 {
+  background-color: white; 
+  color: black; 
+  border: 2px solid #4CAF50;
+}
+
+.button1:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<script>
+
+var svg = d3.select("body")
+	.append("svg")
+	.attr("width", 800)
+	.attr("height", 500);
+	
+var data = [];
+
+var start = 20
+var padding = 5
+var width = 50
+var height = 50
+var color = "teal"
+for(var r=0;r<8;r++)
+{
+ if((r%2)==0)color = "lightgray"
+ else color = "teal"
+ for(var c=0;c<8;c++)
+ {
+  if(!(((r==0)&&(c==0))||((r==7)&&(c==7)))) data.push({x1: start+c*(width+padding), x2: start+c*(width+padding)+width, y1: start+r*(height+padding), y2:start+r*(height+padding)+height, "color":color})
+  if(color=="lightgray")color="teal"
+  else color="lightgray"
+ }
+}
+
+
+var rects = svg.selectAll("rect")
+	.data(data)
+	.enter()
+	.append("rect")
+	.attr("x", d=> d.x1)
+	.attr("y", d=> d.y1)
+	.attr("width", d=> d.x2 - d.x1)
+	.attr("height", d=> d.y2 - d.y1)
+	.attr("fill", d => d.color);
+
+
+
+
+  function dragstarted() {
+    d3.select(this).attr("stroke", "black");
+  }
+
+  function dragged() {
+    d3.select(this).attr("transform", "translate(" + 
+      (d3.event.x-500) + "," + (d3.event.y-20) + ")");
+  }
+
+  function dragended() {
+    d3.select(this).attr("stroke", null);
+  }
+
+
+drag = d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
+
+
+function create_horizontal_domino(){
+ var data_dominoes = [{x1: 500, x2: 550, y1: 20, y2:72.5, "color":"white"},
+ {x1: 500, x2: 550, y1: 72.5, y2:125, "color":"white"}];
+
+ var svg_grp = svg.append("g")
+        .call(drag);
+
+ svg_grp.selectAll("rect")
+	.data(data_dominoes)
+	.enter()
+	.append("rect")
+	.attr("x", d=> d.x1)
+	.attr("y", d=> d.y1)
+	.attr("width", d=> d.x2 - d.x1)
+	.attr("height", d=> d.y2 - d.y1)
+	.attr("style", "outline: thin solid red;")
+	.attr("fill", d => d.color);
+
+}
+
+function create_vertical_domino(){
+ var data_dominoes = [{x1: 500, x2: 552.5, y1: 20, y2:70, "color":"white"},
+ {x1: 552.5, x2: 605, y1: 20, y2:70, "color":"white"}];
+
+ var svg_grp = svg.append("g")
+        .call(drag);
+
+ svg_grp.selectAll("rect")
+	.data(data_dominoes)
+	.enter()
+	.append("rect")
+	.attr("x", d=> d.x1)
+	.attr("y", d=> d.y1)
+	.attr("width", d=> d.x2 - d.x1)
+	.attr("height", d=> d.y2 - d.y1)
+	.attr("style", "outline: thin solid red;")
+	.attr("fill", d => d.color);
+
+}
+
+var svg = d3.select("svg");
+
+var index_arr = [0, 1, 2, 3, 4, 5, 6, 7];
+
+var text = svg.selectAll('text')
+    .data(index_arr)
+   .enter().append('text')
+    .attr("x", function(d,i){return i*55+35})
+    .attr("y", function(d,i){return 10 })
+    .attr("fill", "#000")
+    .text(function(d){return d});
+
+for(var i=0;i<8;i++)index_arr.push(i)
+
+var text = svg.selectAll('text')
+    .data(index_arr)
+   .enter().append('text')
+    .attr("x", function(d,i){return 5})
+    .attr("y", function(d,i){return (i-8)*55+50})
+    .attr("fill", "#000")
+    .text(function(d){return d});
+
+</script>
+
+<br>
+<button class="button button1" onclick="create_horizontal_domino()">New vertical domino</button>
+<button class="button button1" onclick="create_vertical_domino()">New horizontal domino</button>
+
+</body>
+</html>
