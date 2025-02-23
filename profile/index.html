@@ -62,16 +62,20 @@ body{
  <h2>Projects:</h2>
  <ul>
   <li>
-Graph spanners: A spanner is a subgraph that preserves the shortest path distances approximately. Real-life networks contain millions of nodes, billions of edges, and an algorithm will be computationally expensive if the network is dense. In that case, we can compute a spanner to generate a sparse graph but with similar properties. Note that, Steiner tree is a special case of spanners. We formulated a multi-level version of spanners and a weighted version of additive spanners. We developed efficient algorithms for different types of spanners.
+Graph spanners: Graph spanners are subgraphs that approximate the shortest path distances of the original graph while significantly reducing its density. Real-world networks often consist of millions of nodes and billions of edges, making computations on dense graphs highly expensive. Spanners help address this issue by constructing sparse subgraphs that retain essential structural properties. A Steiner tree is a special case of a spanner. Our research focuses on developing efficient algorithms for various types of spanners, including single-level weighted additive spanners and multi-level spanners. The goal of this spanner construction is to facilitate the visualization of large-scale networks. Similar to an interactive geographic map—where continents appear at the highest level, followed by countries, highways, and streets as we zoom in—our approach aims to represent networks in a hierarchical manner. At the top level, the most important nodes and connections are visible, and as we zoom in, additional details, such as intermediate nodes that link higher-importance nodes, gradually emerge.
+<img style="width: 40%;height: auto;border: 2px solid #333;border-radius: 10px;margin:auto;display:block;" src="https://abureyanahmed.github.io/data_visualization/figures/motivation_clear.png" alt="Spanners">
   </li>
   <li>
-Network visualization using maps: Maps are used in day to day life for visualizing geographic maps e.g. Google Maps. There is a relationship between networks and maps: any planar graph can be converted to a map and vice versa. However, even if the graph is not planar a similar idea can be applied. A network can capture multi-relational data and have a significant impact on data visualization. The goal of this project is to visualize large networks using maps that incorporate semantic zooming as other traditional maps. We are using this visualization currently on research networks.
+Network visualization using maps: We are developing scalable and readable visualizations for large-scale networks using multi-level spanners and efficient layout algorithms. While spanners help reduce complexity, we are ensuring that a well-structured layout makes the visualization clearer. Force-directed algorithms create natural layouts but often introduce edge crossings and label overlaps, which we are addressing. Inspired by the four-color theorem, we are using clustering techniques to transform networks into intuitive, map-like representations. We are designing a tree layout algorithm that prevents edge crossings, avoids label overlaps, preserves edge lengths, and maintains compactness. Extending this approach to general graphs, we extract hierarchical structures and integrate spanner-based techniques. This enables seamless, multi-level exploration, making complex networks more interpretable.
+<img style="width: 40%;height: auto;border: 2px solid #333;border-radius: 10px;margin:auto;display:block;" src="https://tiga1231.github.io/zmlt/demo/teaser.64e90583.png" alt="Network map" width="1000">
   </li>
   <li>
-Solving graph problems using GNN: Neural networks are one of the most popular tools in data science. A traditional neural network is sequential and does not work well for multi-relational objects like graphs. A special kind of neural network called graph neural network (GNN) has been developed to handle such objects. GNNs have shown promising results for NP-complete problems. We are working on different models of GNNs to solve graph-related problems. Currently, we are using GNNs to compute Steiner trees.
+Solving graph problems using GNN: Neural networks are one of the most popular tools in data science. A traditional neural network is sequential and does not work well for multi-relational objects like graphs. A special type of neural network called a Graph Neural Network (GNN) has been developed to handle such objects. GNNs have shown promising results for NP-complete problems. We are working on different models of GNNs to solve graph-related problems. Currently, we are using GNNs to compute Steiner trees.
+<img style="width: 40%;height: auto;border: 2px solid #333;border-radius: 10px;margin:auto;display:block;" src="gnn_steiner.png" alt="Graph problems using GNN" width="1000">
   </li>
   <li>
 Graph drawing via gradient descent: Developing an optimization framework that simultaneously optimizes stress together with several other criteria: edge crossings, minimum crossing angle, and upwardness (for directed acyclic graphs). This is a machine learning approach for network visualization. We are using different variations of gradient descent to generate layouts that optimize multiple criteria at the same time. The algorithms designed to optimize one criterion only typically do not provide good results on other metrics, whereas our approach has the flexibility to optimize multiple criteria as well as preserving the network topology.
+<img style="width: 40%;height: auto;border: 2px solid #333;border-radius: 10px;margin:auto;display:block;" src="gd2.png" alt="Graph drawing using gradient descent" width="1000">
   </li>
   <li>
 Online facility assignment: We formulated an online problem where a set of facilities is situated on an object e.g. graph, plane, line. Each facility has a capacity. The customers appear in an online manner and have to be assigned to a free facility before a new customer appears. We developed different deterministic and randomized algorithms for this problem. This problem is related to game theory, the analysis of the algorithms we are developing is similar to a game between an online player and an adversary.
@@ -79,7 +83,7 @@ Online facility assignment: We formulated an online problem where a set of facil
  </ul> 
 </div>
 
-<div>
+<!--<div>
  <h2>Journal Publications:</h2>
  <ul>
   <li>Reyan Ahmed, Felice De Luca, Sabin Devkota, Stephen Kobourov, Mingwei Li, Multicriteria Scalable Graph Drawing via Stochastic Gradient Descent, (SGD)<sup>2</sup>, IEEE Transactions on Visualization and Computer Graphics, (also arXiv:2112.01571), 2022.</li>
@@ -117,7 +121,7 @@ Online facility assignment: We formulated an online problem where a set of facil
   <li>Reyan Ahmed, Keaton Hamm, Mohammad Javad Latifi Jebelli, Stephen Kobourov, Faryad Darabi Sahneh, and Richard Spence. Multi-Level Graph Sketches via Single-Level Solvers, arXiv:1905.00536, 2019.</li>
   <li>Reyan Ahmed, Felice De Luca, Sabin Devkota, Alon Efrat, Md Iqbal Hossain, Stephen Kobourov, Jixian Li, Sammi Abida Salma and Eric Welch, L-Graphs and Monotone L-Graphs, 1703.01544, 2017.</li>
  </ul>
-</div>
+</div>-->
 
 <div>
  <h2>Presentations:</h2>
