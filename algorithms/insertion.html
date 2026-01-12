@@ -1,1 +1,142 @@
-asdf
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Insertion Sort Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            padding: 20px;
+        }
+
+        #arrayContainer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .array-item {
+            border: 2px solid black;
+            padding: 10px 15px;
+            background-color: white;
+            color: black;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .highlight {
+            background-color: black;
+            color: white;
+        }
+
+        .compare {
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Insertion Sort Step-by-Step</h2>
+
+    <input type="number" id="numberInput">
+    <button onclick="addNumber()">Add</button>
+    <button onclick="nextStep()">Next</button>
+    <button onclick="compareStep()">Compare</button>
+    <button onclick="insertStep()">Insert</button>
+
+    <div id="arrayContainer"></div>
+
+    <script>
+        const numbers = [];
+        let currentIndex = -1;   // black-highlighted index
+        let compareOffset = 0;   // gray-highlight offset
+        let insertOffset = 0;    // how many shifts done
+        let key = null;          // stored key value
+
+        function addNumber() {
+            const input = document.getElementById("numberInput");
+            if (input.value === "") return;
+
+            numbers.push(Number(input.value));
+            input.value = "";
+            displayArray();
+        }
+
+        function nextStep() {
+            if (numbers.length === 0) return;
+
+            currentIndex++;
+            if (currentIndex >= numbers.length) {
+                currentIndex = numbers.length - 1;
+                return;
+            }
+
+            compareOffset = 0;
+            insertOffset = 0;
+            key = null;
+            displayArray();
+        }
+
+        function compareStep() {
+            if (currentIndex <= 0) return;
+
+            compareOffset++;
+            if (currentIndex - compareOffset < 0) {
+                compareOffset--;
+                return;
+            }
+
+            displayArray();
+        }
+
+        function insertStep() {
+            if (currentIndex <= 0) return;
+
+            // First insert click → store key
+            if (key === null) {
+                key = numbers[currentIndex];
+            }
+
+            insertOffset++;
+
+            const fromIndex = currentIndex - insertOffset;
+            const toIndex = fromIndex + 1;
+
+            // If we are still shifting values
+            if (fromIndex >= 0) {
+                numbers[toIndex] = numbers[fromIndex];
+            }
+
+            // If we have reached the gray element, place key
+            if (insertOffset > compareOffset) {
+                numbers[currentIndex - compareOffset] = key;
+                key = null; // insertion complete
+            }
+
+            displayArray();
+        }
+
+        function displayArray() {
+            const container = document.getElementById("arrayContainer");
+            container.innerHTML = "";
+
+            numbers.forEach((num, index) => {
+                const div = document.createElement("div");
+                div.className = "array-item";
+                div.textContent = num;
+
+                if (index === currentIndex) {
+                    div.classList.add("highlight");
+                } 
+                else if (index === currentIndex - compareOffset && compareOffset > 0) {
+                    div.classList.add("compare");
+                }
+
+                container.appendChild(div);
+            });
+        }
+    </script>
+
+</body>
+</html>
