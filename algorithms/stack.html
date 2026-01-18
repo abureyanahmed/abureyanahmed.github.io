@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stack Operations Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stack-container {
+            width: 200px;
+            margin: 20px auto;
+            border: 2px solid #333;
+            background: #fff;
+            padding: 10px;
+
+            /* IMPORTANT PART */
+            display: flex;
+            flex-direction: column-reverse; /* bottom stays fixed */
+            justify-content: flex-start;
+            min-height: 250px;
+        }
+
+        .stack-item {
+            border: 1px solid #555;
+            margin: 5px 0;
+            padding: 8px;
+            background: #cce5ff;
+            font-weight: bold;
+        }
+
+        input, button {
+            padding: 8px;
+            margin: 5px;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Stack Operations Simulation</h2>
+
+<input type="text" id="value" placeholder="Enter value">
+<br>
+
+<button onclick="push()">PUSH</button>
+<button onclick="pop()">POP</button>
+<button onclick="isEmpty()">STACK-EMPTY</button>
+
+<div class="stack-container" id="stackView"></div>
+
+<div id="message"></div>
+
+<script>
+    let stack = [];
+
+    function stackEmpty() {
+        return stack.length === 0;
+    }
+
+    function push() {
+        const value = document.getElementById("value").value;
+        if (value === "") {
+            showMessage("Enter a value to push.");
+            return;
+        }
+
+        stack.push(value);
+        document.getElementById("value").value = "";
+        showMessage("");
+        renderStack();
+    }
+
+    function pop() {
+        if (stackEmpty()) {
+            showMessage("Error: Underflow (Stack is empty)");
+        } else {
+            stack.pop();
+            showMessage("");
+            renderStack();
+        }
+    }
+
+    function isEmpty() {
+        showMessage(stackEmpty() ? "Stack is EMPTY" : "Stack is NOT EMPTY");
+    }
+
+    function renderStack() {
+        const view = document.getElementById("stackView");
+        view.innerHTML = "";
+
+        // Render bottom → top (CSS reverses it visually)
+        stack.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "stack-item";
+            div.textContent = item;
+            view.appendChild(div);
+        });
+    }
+
+    function showMessage(msg) {
+        document.getElementById("message").textContent = msg;
+    }
+</script>
+
+</body>
+</html>
