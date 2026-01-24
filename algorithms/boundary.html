@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive Lines</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  gap: 20px;
+}
+
+#controls {
+  width: 260px;
+}
+
+svg {
+  border: 1px solid #ccc;
+  background: #fafafa;
+}
+
+.line {
+  stroke: steelblue;
+  stroke-width: 2;
+  cursor: pointer;
+}
+
+.line.hovered {
+  stroke: orange;
+  stroke-width: 4;
+}
+
+.line.selected {
+  stroke: red;
+  stroke-width: 4;
+}
+
+.segment-hover {
+  stroke: orange;
+  stroke-width: 5;
+  pointer-events: stroke;
+}
+
+.segment-selected {
+  stroke: green;
+  stroke-width: 5;
+  pointer-events: stroke;
+}
+
+.intersection {
+  fill: purple;
+}
+
+.adjust-btn {
+  width: 28px;
+}
+
+#selectedControls {
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="controls">
+  <h3>Add Line</h3>
+
+  <label>Slope:</label><br>
+  <input id="slopeInput" type="number" value="1" step="0.1"><br><br>
+
+  <label>Intercept:</label><br>
+  <input id="interceptInput" type="number" value="0" step="0.1"><br><br>
+
+  <button onclick="addLine()">Add Line</button>
+  <button onclick="showIntersections()">Show Intersections</button>
+
+  <hr>
+
+  <label>
+    <input type="checkbox" id="segmentMode">
+    Segment mode
+  </label>
+
+  <div id="selectedControls" style="display:none;">
+    <hr>
+    <h4>Selected Line</h4>
+    Slope: <span id="slopeVal"></span><br>
+    <button class="adjust-btn"
+      onmousedown="startAdjust('m',0.1)"
+      onmouseup="stopAdjust()"
+      onmouseleave="stopAdjust()">+</button>
+    <button class="adjust-btn"
+      onmousedown="startAdjust('m',-0.1)"
+      onmouseup="stopAdjust()"
+      onmouseleave="stopAdjust()">−</button>
+
+    <br><br>
+
+    Intercept: <span id="interceptVal"></span><br>
+    <button class="adjust-btn"
+      onmousedown="startAdjust('b',0.1)"
+      onmouseup="stopAdjust()"
+      onmouseleave="stopAdjust()">+</button>
+    <button class="adjust-btn"
+      onmousedown="startAdjust('b',-0.1)"
+      onmouseup="stopAdjust()"
+      onmouseleave="stopAdjust()">−</button>
+  </div>
+</div>
+
+<svg id="graph" width="600" height="600"></svg>
+
+<script>
+const svg = document.getElementById("graph");
+const segmentMode = document.getElementById("segmentMode");
+const width = 600;
+const height = 600;
+const scale = 40;
+const origin = { x: width/2, y: height/2 };
+
+let lines = [];
+let intersections = [];
+let selectedLine = null;
+let hoverSegment = null;
+let selectedSegment = null;
+let adjustTimer = null;
+
+/* Axes */
+(function drawAxes(){
+  ["x","y"].forEach(a=>{
+    const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+    if(a==="x"){
+      l.setAttribute("x1",0); l.setAttribute("y1",origin.y);
+      l.setAttribute("x2",width); l.setAttribute("y2",origin.y);
+    } else {
+      l.setAttribute("x1",origin.x); l.setAttribute("y1",0);
+      l.setAttribute("x2",origin.x); l.setAttribute("y2",height);
+    }
+    l.setAttribute("stroke","#aaa");
+    svg.appendChild(l);
+  });
+})();
+
+function graphToScreen(x,y){
+  return { x: origin.x + x*scale, y: origin.y - y*scale };
+}
+
+function screenToGraph(x,y){
+  return { x:(x-origin.x)/scale, y:(origin.y-y)/scale };
+}
+
+/* Lines */
+function addLine(){
+  const m = +slopeInput.value;
+  const b = +interceptInput.value;
+
+  const el = document.createElementNS("http://www.w3.org/2000/svg","line");
+  el.classList.add("line");
+
+  const line = { m, b, el };
+  lines.push(line);
+
+  el.addEventListener("mouseenter",()=>{
+    if(!segmentMode.checked && line!==selectedLine)
+      el.classList.add("hovered");
+  });
+
+  el.addEventListener("mouseleave",()=>{
+    el.classList.remove("hovered");
+  });
+
+  el.addEventListener("click",()=>{
+    if(segmentMode.checked) return;
+    selectLine(line);
+  });
+
+  svg.appendChild(el);
+  updateLine(line);
+}
+
+function updateLine(line){
+  const x1=-10,x2=10;
+  const p1=graphToScreen(x1,line.m*x1+line.b);
+  const p2=graphToScreen(x2,line.m*x2+line.b);
+  line.el.setAttribute("x1",p1.x);
+  line.el.setAttribute("y1",p1.y);
+  line.el.setAttribute("x2",p2.x);
+  line.el.setAttribute("y2",p2.y);
+}
+
+function selectLine(line){
+  if(selectedLine) selectedLine.el.classList.remove("selected");
+  selectedLine = line;
+  line.el.classList.add("selected");
+  selectedControls.style.display = "block";
+  updateSelectedUI();
+}
+
+function updateSelectedUI(){
+  slopeVal.textContent = selectedLine.m.toFixed(2);
+  interceptVal.textContent = selectedLine.b.toFixed(2);
+}
+
+/* Adjust slope / intercept */
+function startAdjust(prop, delta){
+  if(segmentMode.checked || !selectedLine) return;
+  stopAdjust();
+  adjustTimer = setInterval(()=>{
+    selectedLine[prop] += delta;
+    updateLine(selectedLine);
+    updateSelectedUI();
+    showIntersections();
+  },100);
+}
+
+function stopAdjust(){
+  clearInterval(adjustTimer);
+}
+
+/* Intersections */
+function showIntersections(){
+  intersections=[];
+  document.querySelectorAll(".intersection").forEach(e=>e.remove());
+
+  for(let i=0;i<lines.length;i++){
+    for(let j=i+1;j<lines.length;j++){
+      if(lines[i].m===lines[j].m) continue;
+      const x=(lines[j].b-lines[i].b)/(lines[i].m-lines[j].m);
+      const y=lines[i].m*x+lines[i].b;
+      intersections.push({x,y,lines:[lines[i],lines[j]]});
+      const p=graphToScreen(x,y);
+      const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      c.setAttribute("cx",p.x);
+      c.setAttribute("cy",p.y);
+      c.setAttribute("r",4);
+      c.classList.add("intersection");
+      svg.appendChild(c);
+    }
+  }
+}
+
+/* Segment mode hover + selection */
+svg.addEventListener("mousemove", e=>{
+  if(!segmentMode.checked) return;
+
+  if(hoverSegment) hoverSegment.remove();
+
+  const {x,y}=screenToGraph(e.offsetX,e.offsetY);
+
+  let best=null;
+  lines.forEach(line=>{
+    const px=(x+line.m*(y-line.b))/(1+line.m*line.m);
+    const py=line.m*px+line.b;
+    const d=Math.hypot(x-px,y-py);
+    if(d<0.3 && (!best||d<best.d))
+      best={line,px};
+  });
+
+  if(!best) return;
+
+  const xs=intersections
+    .filter(i=>i.lines.includes(best.line))
+    .map(i=>i.x)
+    .sort((a,b)=>a-b);
+
+  let left=null,right=null;
+  xs.forEach(v=>{
+    if(v<best.px) left=v;
+    if(v>best.px && right===null) right=v;
+  });
+
+  const xa=left ?? -10;
+  const xb=right ?? 10;
+
+  hoverSegment=document.createElementNS("http://www.w3.org/2000/svg","line");
+  hoverSegment.classList.add("segment-hover");
+
+  const p1=graphToScreen(xa,best.line.m*xa+best.line.b);
+  const p2=graphToScreen(xb,best.line.m*xb+best.line.b);
+
+  hoverSegment.setAttribute("x1",p1.x);
+  hoverSegment.setAttribute("y1",p1.y);
+  hoverSegment.setAttribute("x2",p2.x);
+  hoverSegment.setAttribute("y2",p2.y);
+
+  hoverSegment.addEventListener("click",()=>{
+    if(selectedSegment) selectedSegment.remove();
+
+    selectedSegment = hoverSegment.cloneNode();
+    selectedSegment.classList.remove("segment-hover");
+    selectedSegment.classList.add("segment-selected");
+    svg.appendChild(selectedSegment);
+
+    hoverSegment.remove();
+    hoverSegment = null;
+  });
+
+  svg.appendChild(hoverSegment);
+});
+
+/* Cleanup */
+segmentMode.addEventListener("change",()=>{
+  if(segmentMode.checked){
+    if(selectedLine){
+      selectedLine.el.classList.remove("selected");
+      selectedLine = null;
+      selectedControls.style.display = "none";
+    }
+  } else {
+    if(hoverSegment) hoverSegment.remove();
+    if(selectedSegment) selectedSegment.remove();
+    hoverSegment = null;
+    selectedSegment = null;
+  }
+});
+</script>
+
+</body>
+</html>
