@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Recurrence Tree Visualizer</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+    }
+
+    h2 {
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .controls {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+        width: 200px;
+        padding: 6px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    button {
+        padding: 7px 14px;
+        font-size: 15px;
+        margin: 0 4px;
+        cursor: pointer;
+    }
+
+    .equation {
+        text-align: center;
+        font-size: 20px;
+        margin: 8px 0;
+        font-weight: bold;
+    }
+
+    .container {
+        display: flex;
+        height: 650px;
+        width: 100%;
+    }
+
+    .tree-view {
+        width: 90%;
+        background: white;
+        border-right: 1px solid #ccc;
+    }
+
+    .level-view {
+        width: 10%;
+        background: #fafafa;
+        padding: 10px;
+        box-sizing: border-box;
+        font-size: 14px;
+        overflow-y: auto;
+    }
+
+    .level-view h3 {
+        margin-top: 0;
+        text-align: center;
+    }
+
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    circle {
+        fill: white;
+        stroke: none;
+    }
+
+    text {
+        fill: black;
+        font-size: 16px;
+        font-weight: bold;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+    }
+
+    line {
+        stroke: black;
+        stroke-width: 1.5;
+    }
+
+    .level-item {
+        margin-bottom: 8px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 4px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Recurrence Tree Visualizer</h2>
+
+<div class="controls">
+    T(n) =
+    <input type="text" id="termInput" placeholder="e.g. T(n/2)">
+    <button onclick="addTerm()">Add</button>
+    <button onclick="nextStep()">Next</button>
+    <button onclick="resetAll()">Reset</button>
+</div>
+
+<div class="equation" id="equation">T(n) =</div>
+
+<div class="container">
+    <div class="tree-view">
+        <svg id="tree"></svg>
+    </div>
+
+    <div class="level-view">
+        <h3>Level Sum</h3>
+        <div id="levels"></div>
+    </div>
+</div>
+
+<script>
+    const svg = document.getElementById("tree");
+    const equationDiv = document.getElementById("equation");
+    const levelsDiv = document.getElementById("levels");
+
+    const levelHeight = 95;
+    const nodeRadius = 22;
+
+    let rhsTerms = [];
+    let expandedTerms = [];
+    let nodes = [];
+    let level = 0;
+
+    function addTerm() {
+        const input = document.getElementById("termInput");
+        const term = input.value.trim();
+        if (!term) return;
+
+        rhsTerms.push(term);
+        rebuildExpandedTerms();
+        updateEquation();
+        input.value = "";
+    }
+
+    function updateEquation() {
+        equationDiv.textContent = "T(n) = " + rhsTerms.join(" + ");
+    }
+
+    function rebuildExpandedTerms() {
+        expandedTerms = [];
+        rhsTerms.forEach(term => {
+            const match = term.match(/^(\d*)\s*T\(([^)]+)\)/);
+            if (match) {
+                const coef = match[1] === "" ? 1 : parseInt(match[1]);
+                const label = match[2];
+                for (let i = 0; i < coef; i++) {
+                    expandedTerms.push(label);
+                }
+            }
+        });
+    }
+
+    function nextStep() {
+        if (expandedTerms.length < 1) return;
+
+        if (level === 0) {
+            const width = svg.clientWidth;
+            nodes = [{ x: width / 2, y: 40, label: "n" }];
+            drawNode(width / 2, 40, formatNodeLabel("n"));
+        } else {
+            const newNodes = [];
+            const width = svg.clientWidth;
+            const spacing = width / (nodes.length * expandedTerms.length + 1);
+            let index = 0;
+
+            nodes.forEach(parent => {
+                expandedTerms.forEach(fraction => {
+                    const childLabel = multiplyLabel(parent.label, fraction);
+                    index++;
+                    const x = spacing * index;
+                    const y = parent.y + levelHeight;
+
+                    drawEdge(parent.x, parent.y, x, y);
+                    drawNode(x, y, formatNodeLabel(childLabel));
+
+                    newNodes.push({ x, y, label: childLabel });
+                });
+            });
+
+            nodes = newNodes;
+        }
+
+        updateLevelSums();
+        level++;
+    }
+
+    // Node labels: cn or c(...)
+    function formatNodeLabel(label) {
+        return label === "n" ? "cn" : `c(${label})`;
+    }
+
+    function multiplyLabel(parent, fraction) {
+        const [pNum, pDen] = parseLabel(parent);
+        const [fNum, fDen] = parseLabel(fraction);
+        const num = pNum * fNum;
+        const den = pDen * fDen;
+        if (den === 1) return num === 1 ? "n" : `${num}n`;
+        return (num === 1 ? "n" : `${num}n`) + `/${den}`;
+    }
+
+    function parseLabel(label) {
+        if (label === "n") return [1, 1];
+        const match = label.match(/^(\d*)n(?:\/(\d+))?$/);
+        if (match) {
+            const coef = match[1] === "" ? 1 : parseInt(match[1]);
+            const denom = match[2] ? parseInt(match[2]) : 1;
+            return [coef, denom];
+        }
+        return [0, 1];
+    }
+
+    function gcd(a, b) {
+        return b === 0 ? a : gcd(b, a % b);
+    }
+
+    function updateLevelSums() {
+        let num = 0, den = 1;
+
+        nodes.forEach(node => {
+            const [n, d] = parseLabel(node.label);
+            num = num * d + n * den;
+            den = den * d;
+            const g = gcd(num, den);
+            num /= g;
+            den /= g;
+        });
+
+        let expr;
+        if (den === 1) {
+            expr = "cn";
+        } else {
+            const nPart = num === 1 ? "n" : `${num}n`;
+            expr = `c(${nPart}/${den})`;
+        }
+
+        const div = document.createElement("div");
+        div.className = "level-item";
+        div.textContent = `Level ${level + 1}: ${expr}`;
+        levelsDiv.appendChild(div);
+    }
+
+    function drawEdge(x1, y1, x2, y2) {
+        const dx = x2 - x1, dy = y2 - y1;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        const startX = x1 + (dx / len) * nodeRadius;
+        const startY = y1 + (dy / len) * nodeRadius;
+        const endX = x2 - (dx / len) * nodeRadius;
+        const endY = y2 - (dy / len) * nodeRadius;
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", startX);
+        line.setAttribute("y1", startY);
+        line.setAttribute("x2", endX);
+        line.setAttribute("y2", endY);
+        svg.appendChild(line);
+    }
+
+    function drawNode(x, y, label) {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.setAttribute("cx", x);
+        c.setAttribute("cy", y);
+        c.setAttribute("r", nodeRadius);
+
+        const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        t.setAttribute("x", x);
+        t.setAttribute("y", y);
+        t.textContent = label;
+
+        g.appendChild(c);
+        g.appendChild(t);
+        svg.appendChild(g);
+    }
+
+    function resetAll() {
+        rhsTerms = [];
+        expandedTerms = [];
+        nodes = [];
+        level = 0;
+        svg.innerHTML = "";
+        levelsDiv.innerHTML = "";
+        equationDiv.textContent = "T(n) =";
+    }
+</script>
+
+</body>
+</html>
