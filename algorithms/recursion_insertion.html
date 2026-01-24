@@ -66,10 +66,10 @@
         height: 100%;
     }
 
-    /* 🔹 CIRCLE STYLE CHANGE HERE */
+    /* white fill + white border */
     circle {
         fill: white;
-        stroke: white;        /* boundary is white */
+        stroke: white;
         stroke-width: 2;
     }
 
@@ -101,7 +101,7 @@
 
 <div class="controls">
     T(n) =
-    <input id="termInput" placeholder="Enter T(n-1) or cn">
+    <input id="termInput" placeholder="Enter T(n-1) and cn">
     <button onclick="addTerm()">Add</button>
     <button onclick="nextStep()">Next</button>
     <button onclick="resetAll()">Reset</button>
@@ -130,7 +130,7 @@ const levelHeight = 90;
 let hasRecurrence = false;
 let hasCost = false;
 
-let nodes = [];
+let node = null;   // single active node
 let level = 0;
 
 /* ---------- INPUT ---------- */
@@ -139,13 +139,8 @@ function addTerm() {
     const input = document.getElementById("termInput");
     const term = input.value.trim();
 
-    if (term === "T(n-1)") {
-        hasRecurrence = true;
-    } else if (term === "cn") {
-        hasCost = true;
-    } else {
-        return;
-    }
+    if (term === "T(n-1)") hasRecurrence = true;
+    if (term === "cn") hasCost = true;
 
     updateEquation();
     input.value = "";
@@ -158,52 +153,61 @@ function updateEquation() {
     equationDiv.textContent = "T(n) = " + parts.join(" + ");
 }
 
-/* ---------- TREE LOGIC ---------- */
+/* ---------- STEP LOGIC ---------- */
 
 function nextStep() {
     if (!hasRecurrence || !hasCost) return;
 
+    // Step 1: just show T(n)
     if (level === 0) {
         const w = svg.clientWidth;
-        nodes = [{ x: w / 2, y: 40, label: "n" }];
-        drawNode(w / 2, 40, "cn");
-        addLevelSum("cn");
-    } else {
-        const parent = nodes[0];
-        const newLabel = decrement(parent.label);
-        const x = parent.x;
-        const y = parent.y + levelHeight;
-
-        drawEdge(parent.x, parent.y, x, y);
-        drawNode(x, y, formatLabel(newLabel));
-
-        nodes = [{ x, y, label: newLabel }];
-        addLevelSum(formatLabel(newLabel));
+        node = { x: w / 2, y: 40, label: "n", kind: "T" };
+        drawNode(node.x, node.y, "T(n)");
+        level++;
+        return;
     }
 
+    // Convert current T(...) -> c(...)
+    if (node.kind === "T") {
+        updateNodeText(node, formatCost(node.label));
+        addLevelSum(formatCost(node.label));
+        node.kind = "c";
+    }
+
+    // Create next T(...) child
+    const newLabel = decrement(node.label);
+    const x = node.x;
+    const y = node.y + levelHeight;
+
+    drawEdge(node.x, node.y, x, y);
+    drawNode(x, y, `T(${newLabel})`);
+
+    node = { x, y, label: newLabel, kind: "T" };
     level++;
 }
 
+/* ---------- LABEL HELPERS ---------- */
+
 function decrement(label) {
     if (label === "n") return "n-1";
-    const match = label.match(/^n-(\d+)$/);
-    return `n-${parseInt(match[1]) + 1}`;
+    const m = label.match(/^n-(\d+)$/);
+    return `n-${parseInt(m[1]) + 1}`;
 }
 
-/* ---------- DISPLAY ---------- */
-
-function formatLabel(label) {
+function formatCost(label) {
     return label === "n" ? "cn" : `c(${label})`;
 }
+
+/* ---------- RIGHT VIEW ---------- */
 
 function addLevelSum(expr) {
     const div = document.createElement("div");
     div.className = "level-item";
-    div.textContent = `Level ${level + 1}: ${expr}`;
+    div.textContent = `Level ${levelsDiv.children.length + 1}: ${expr}`;
     levelsDiv.appendChild(div);
 }
 
-/* ---------- SVG DRAWING ---------- */
+/* ---------- SVG ---------- */
 
 function drawEdge(x1, y1, x2, y2) {
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -232,12 +236,22 @@ function drawNode(x, y, label) {
     svg.appendChild(g);
 }
 
+function updateNodeText(node, text) {
+    const texts = svg.getElementsByTagName("text");
+    for (let t of texts) {
+        if (+t.getAttribute("x") === node.x && +t.getAttribute("y") === node.y) {
+            t.textContent = text;
+            break;
+        }
+    }
+}
+
 /* ---------- RESET ---------- */
 
 function resetAll() {
     hasRecurrence = false;
     hasCost = false;
-    nodes = [];
+    node = null;
     level = 0;
     svg.innerHTML = "";
     levelsDiv.innerHTML = "";
