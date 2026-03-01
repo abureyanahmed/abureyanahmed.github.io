@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prefix Tree</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+    svg {
+        border: 1px solid #ccc;
+        margin-top: 20px;
+    }
+    .node circle {
+        stroke: black;
+        stroke-width: 1.5;
+        fill: white;
+    }
+    .node.end circle {
+        fill: lightgray;
+    }
+    .node.root circle {
+        stroke: none; /* Remove border for root */
+    }
+    .node text {
+        font-size: 14px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+    }
+    .link {
+        stroke: black;
+        stroke-width: 1.2;
+    }
+</style>
+</head>
+<body>
+
+<h2>Random Prefix Tree (Trie)</h2>
+<p><strong>Selected Words:</strong> <span id="words"></span></p>
+
+<svg id="svgCanvas" width="1200" height="600"></svg>
+
+<script>
+// -------------------- TRIE STRUCTURE --------------------
+class TrieNode {
+    constructor(char = "") {
+        this.char = char;
+        this.children = {};
+        this.isEnd = false;
+        this.x = 0;
+        this.y = 0;
+    }
+}
+
+class Trie {
+    constructor() {
+        this.root = new TrieNode("ROOT");
+    }
+
+    insert(word) {
+        let node = this.root;
+        for (let char of word) {
+            if (!node.children[char]) {
+                node.children[char] = new TrieNode(char);
+            }
+            node = node.children[char];
+        }
+        node.isEnd = true;
+    }
+}
+
+// -------------------- WORD POOL --------------------
+const wordPool = [
+    "cat", "car", "cart", "dog", "dove",
+    "apple", "app", "bat", "ball", "banana",
+    "cap", "cape", "can", "cane", "camera"
+];
+
+function getRandomWords(arr, count) {
+    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+}
+
+// -------------------- LAYOUT --------------------
+let currentX = 50;
+const levelHeight = 100;
+
+function layout(node, depth = 0) {
+    const children = Object.values(node.children);
+
+    if (children.length === 0) {
+        node.x = currentX;
+        currentX += 100;
+    } else {
+        children.forEach(child => layout(child, depth + 1));
+        node.x = (children[0].x + children[children.length - 1].x) / 2;
+    }
+
+    node.y = 50 + depth * levelHeight;
+}
+
+// -------------------- DRAW --------------------
+function drawTrie(svg, node, isRoot = false) {
+    const children = Object.values(node.children);
+
+    children.forEach(child => {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", node.x);
+        line.setAttribute("y1", node.y);
+        line.setAttribute("x2", child.x);
+        line.setAttribute("y2", child.y);
+        line.setAttribute("class", "link");
+        svg.appendChild(line);
+
+        drawTrie(svg, child, false);
+    });
+
+    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+    let className = "node";
+    if (node.isEnd) className += " end";
+    if (isRoot) className += " root";
+
+    group.setAttribute("class", className);
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", node.x);
+    circle.setAttribute("cy", node.y);
+    circle.setAttribute("r", 20);
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", node.x);
+    text.setAttribute("y", node.y);
+    text.textContent = node.char;
+
+    group.appendChild(circle);
+    group.appendChild(text);
+    svg.appendChild(group);
+}
+
+// -------------------- MAIN --------------------
+window.onload = function() {
+    const randomWords = getRandomWords(wordPool, 6);
+    document.getElementById("words").textContent = randomWords.join(", ");
+
+    const trie = new Trie();
+    randomWords.forEach(word => trie.insert(word));
+
+    currentX = 50;
+    layout(trie.root);
+
+    const svg = document.getElementById("svgCanvas");
+    svg.innerHTML = "";
+    drawTrie(svg, trie.root, true);
+};
+</script>
+
+</body>
+</html>

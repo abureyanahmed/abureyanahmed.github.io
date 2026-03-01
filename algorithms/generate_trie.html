@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prefix Tree</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+    input {
+        padding: 6px;
+        font-size: 14px;
+    }
+    button {
+        padding: 6px 10px;
+        margin-left: 5px;
+        cursor: pointer;
+    }
+    #wordList {
+        margin-top: 15px;
+        font-weight: bold;
+    }
+    svg {
+        border: 1px solid #ccc;
+        margin-top: 20px;
+    }
+    .node circle {
+        stroke: black;
+        stroke-width: 1.5;
+        fill: white;
+    }
+    .node.end circle {
+        fill: lightgray;
+    }
+    .node.root circle {
+        stroke: none;
+    }
+    .node text {
+        font-size: 14px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+    }
+    .link {
+        stroke: black;
+        stroke-width: 1.2;
+    }
+</style>
+</head>
+<body>
+
+<h2>Interactive Prefix Tree (Trie)</h2>
+
+<input type="text" id="wordInput" placeholder="Enter a word">
+<button onclick="addWord()">Add Word</button>
+<button onclick="drawTrieFromList()">Draw Trie</button>
+
+<div id="wordList">Words: (none)</div>
+
+<svg id="svgCanvas" width="1200" height="600"></svg>
+
+<script>
+// -------------------- DATA --------------------
+let words = [];
+
+// -------------------- TRIE --------------------
+class TrieNode {
+    constructor(char = "") {
+        this.char = char;
+        this.children = {};
+        this.isEnd = false;
+        this.x = 0;
+        this.y = 0;
+    }
+}
+
+class Trie {
+    constructor() {
+        this.root = new TrieNode("ROOT");
+    }
+
+    insert(word) {
+        let node = this.root;
+        for (let char of word) {
+            if (!node.children[char]) {
+                node.children[char] = new TrieNode(char);
+            }
+            node = node.children[char];
+        }
+        node.isEnd = true;
+    }
+}
+
+// -------------------- INPUT HANDLING --------------------
+function addWord() {
+    const input = document.getElementById("wordInput");
+    const word = input.value.trim();
+
+    if (word.length === 0) return;
+
+    words.push(word);
+    input.value = "";
+    updateWordList();
+}
+
+function updateWordList() {
+    const display = words.length ? words.join(", ") : "(none)";
+    document.getElementById("wordList").textContent = "Words: " + display;
+}
+
+// -------------------- LAYOUT --------------------
+let currentX = 50;
+const levelHeight = 100;
+
+function layout(node, depth = 0) {
+    const children = Object.values(node.children);
+
+    if (children.length === 0) {
+        node.x = currentX;
+        currentX += 100;
+    } else {
+        children.forEach(child => layout(child, depth + 1));
+        node.x = (children[0].x + children[children.length - 1].x) / 2;
+    }
+
+    node.y = 50 + depth * levelHeight;
+}
+
+// -------------------- DRAW --------------------
+function drawTrie(svg, node, isRoot = false) {
+    const children = Object.values(node.children);
+
+    children.forEach(child => {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", node.x);
+        line.setAttribute("y1", node.y);
+        line.setAttribute("x2", child.x);
+        line.setAttribute("y2", child.y);
+        line.setAttribute("class", "link");
+        svg.appendChild(line);
+
+        drawTrie(svg, child, false);
+    });
+
+    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+    let className = "node";
+    if (node.isEnd) className += " end";
+    if (isRoot) className += " root";
+
+    group.setAttribute("class", className);
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", node.x);
+    circle.setAttribute("cy", node.y);
+    circle.setAttribute("r", 20);
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", node.x);
+    text.setAttribute("y", node.y);
+    text.textContent = node.char;
+
+    group.appendChild(circle);
+    group.appendChild(text);
+    svg.appendChild(group);
+}
+
+// -------------------- DRAW TRIE --------------------
+function drawTrieFromList() {
+    const svg = document.getElementById("svgCanvas");
+    svg.innerHTML = "";
+
+    if (words.length === 0) return;
+
+    const trie = new Trie();
+    words.forEach(word => trie.insert(word));
+
+    currentX = 50;
+    layout(trie.root);
+    drawTrie(svg, trie.root, true);
+}
+</script>
+
+</body>
+</html>
