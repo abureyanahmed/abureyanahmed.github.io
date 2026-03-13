@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Hill Finding</title>
+</head>
+
+<body>
+
+<svg id="canvas" height="200" style="border:1px solid #ccc;"></svg>
+
+<script>
+const svg = document.getElementById("canvas");
+
+const rectCount = 20;
+const rectWidth = 30;
+const gap = 6;
+const padding = 10;   // equal padding on both sides
+const maxHeight = 150;
+const baseY = 180;
+
+// calculate exact SVG width so padding is symmetric
+const svgWidth = rectCount * rectWidth + (rectCount - 1) * gap + padding * 2;
+svg.setAttribute("width", svgWidth);
+
+for (let i = 0; i < rectCount; i++) {
+
+  const height = Math.random() * maxHeight;
+  const x = padding + i * (rectWidth + gap);
+  const y = baseY - height;
+
+  const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+
+  rect.setAttribute("x", x);
+  rect.setAttribute("y", y);
+  rect.setAttribute("width", rectWidth);
+  rect.setAttribute("height", height);
+  rect.setAttribute("fill", "#4a90e2");
+
+  svg.appendChild(rect);
+}
+</script>
+
+</body>
+</html>

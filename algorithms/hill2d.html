@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hill Finding in 2D</title>
+
+<style>
+body{
+  margin:0;
+  overflow:hidden;
+  background:#f5f5f5;
+}
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+</head>
+
+<body>
+
+<script type="module">
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+// Scene
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf5f5f5);
+
+// Camera
+const camera = new THREE.PerspectiveCamera(
+  60,
+  window.innerWidth/window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.set(25,25,25);
+
+// Renderer
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Controls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// Lighting
+const light = new THREE.DirectionalLight(0xffffff,1);
+light.position.set(20,30,20);
+scene.add(light);
+
+scene.add(new THREE.AmbientLight(0xffffff,0.4));
+
+// Parameters
+const gridSize = 15;
+const baseSize = 1;
+const gap = 0.2;
+const maxHeight = 10;
+
+const totalSize = gridSize*baseSize + (gridSize-1)*gap;
+const start = -totalSize/2 + baseSize/2;
+
+// Create boxes
+for(let x=0;x<gridSize;x++){
+  for(let y=0;y<gridSize;y++){
+
+    const height = 1 + Math.random()*maxHeight;
+
+    const geometry = new THREE.BoxGeometry(baseSize, baseSize, height);
+
+    const material = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(`hsl(${200 + height*10},60%,55%)`)
+    });
+
+    const box = new THREE.Mesh(geometry, material);
+
+    box.position.x = start + x*(baseSize+gap);
+    box.position.y = start + y*(baseSize+gap);
+    box.position.z = height/2;
+
+    scene.add(box);
+
+  }
+}
+
+// Grid (rotated to lie on XY plane)
+const grid = new THREE.GridHelper(50,50);
+grid.rotation.x = Math.PI/2;
+scene.add(grid);
+
+// Animation
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene,camera);
+}
+
+animate();
+
+// Resize
+window.addEventListener("resize",()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+</script>
+
+</body>
+</html>
