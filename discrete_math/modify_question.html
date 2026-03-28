@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Text Parser</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #output { margin-top: 20px; }
+    .char { display:inline-block; padding:8px 12px; margin:5px; border:1px solid #ccc; cursor:pointer; border-radius:5px; }
+    .char:hover { background-color:#f0f0f0; }
+    .selected { background-color:#007BFF; color:white; }
+    #editor { width:100%; min-height:120px; margin-top:15px; padding:10px; border:1px solid #ccc; font-size:16px; white-space:pre-wrap; }
+    #viewer { margin-top:20px; padding:10px; border:1px solid #aaa; min-height:100px; white-space:pre-wrap; cursor:pointer; }
+    .highlight { background-color: yellow; }
+    button { padding:10px 15px; font-size:16px; cursor:pointer; margin-top:10px; }
+    input[type="text"] { width:100%; padding:8px; margin-top:10px; font-size:16px; }
+    #controls { margin-top:20px; }
+  </style>
+</head>
+<body>
+
+<h2>Upload Text File</h2>
+<input type="file" id="fileInput" accept=".txt">
+
+<h2>Enter Character</h2>
+<input type="text" id="charInput" placeholder="Type a character">
+
+<div id="output">No data yet</div>
+
+<div id="controls">
+  <h3>Options</h3>
+  <label><input type="radio" name="mode" value="ask" checked> Ask about character</label><br>
+  <label><input type="radio" name="mode" value="change"> Change homework questions</label>
+
+  <!-- Ask Mode -->
+  <div id="askContainer">
+    <button id="askButton">Select a character</button>
+  </div>
+
+  <!-- Change Mode -->
+  <div id="changeContainer" style="display:none;">
+    <div id="editor" contenteditable="true"></div>
+    <button id="showTextBtn">Show Text</button>
+    <div id="viewer"></div>
+    <button id="copyViewerBtn">Copy Text</button>
+  </div>
+</div>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const charInput = document.getElementById('charInput');
+  const output = document.getElementById('output');
+
+  const editor = document.getElementById('editor');
+  const viewer = document.getElementById('viewer');
+  const showTextBtn = document.getElementById('showTextBtn');
+  const copyViewerBtn = document.getElementById('copyViewerBtn');
+
+  const askButton = document.getElementById('askButton');
+  const askContainer = document.getElementById('askContainer');
+  const changeContainer = document.getElementById('changeContainer');
+
+  let dataMap = {};
+  let selectedChar = null;
+  let highlightedSpan = null;
+
+  // --- File Parsing ---
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const buffer = await file.arrayBuffer();
+    const text = new TextDecoder("utf-8").decode(buffer);
+    parseText(text);
+  });
+
+  function parseText(text) {
+    dataMap = {};
+    const lines = text.split(/\r?\n/);
+    lines.forEach(line => {
+      if (!line || line.startsWith('#')) return;
+      const key = Array.from(line)[0];
+      const rest = Array.from(line.slice(1));
+      dataMap[key] = rest;
+    });
+  }
+
+  // --- Character Input ---
+  charInput.addEventListener('input', () => {
+    const value = charInput.value;
+    if (!value) return;
+    const lastChar = Array.from(value).pop();
+    charInput.value = lastChar;
+    showCharacters(lastChar);
+  });
+
+  function showCharacters(char) {
+    output.innerHTML = '';
+    selectedChar = null;
+    updateAskButton();
+
+    if (!dataMap[char]) {
+      output.textContent = 'No data found';
+      return;
+    }
+
+    dataMap[char].forEach(c => {
+      const span = document.createElement('span');
+      span.textContent = c;
+      span.className = 'char';
+      span.addEventListener('click', () => {
+        if (getMode() === 'ask') {
+          selectedChar = c;
+          updateAskButton();
+        } else {
+          replaceHighlighted(c);
+        }
+      });
+      output.appendChild(span);
+    });
+  }
+
+  function updateAskButton() {
+    if (selectedChar) {
+      askButton.textContent = `What is ${selectedChar}?`;
+    } else {
+      askButton.textContent = 'Select a character';
+    }
+  }
+
+  askButton.addEventListener('click', async () => {
+    if (!selectedChar) return;
+    const text = `What is ${selectedChar}?`;
+    try {
+      await navigator.clipboard.writeText(text);
+      askButton.textContent = "Copied!";
+      setTimeout(updateAskButton, 1000);
+    } catch {
+      alert("Clipboard failed");
+    }
+  });
+
+  function getMode() { return document.querySelector('input[name="mode"]:checked').value; }
+
+  // --- Mode Switching ---
+  document.querySelectorAll('input[name="mode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (getMode() === 'ask') { askContainer.style.display = 'block'; changeContainer.style.display = 'none'; }
+      else { askContainer.style.display = 'none'; changeContainer.style.display = 'block'; }
+    });
+  });
+
+  // --- Change Mode: Show Text ---
+  showTextBtn.addEventListener('click', () => {
+    const text = editor.innerText;
+    renderViewer(text);
+  });
+
+  function renderViewer(text) {
+    viewer.innerHTML = '';
+    highlightedSpan = null;
+    Array.from(text).forEach(char => {
+      const span = document.createElement('span');
+      span.textContent = char;
+      span.addEventListener('click', () => highlightSingleSpan(span));
+      viewer.appendChild(span);
+    });
+  }
+
+  function highlightSingleSpan(span) {
+    if (highlightedSpan) highlightedSpan.classList.remove('highlight');
+    highlightedSpan = span;
+    highlightedSpan.classList.add('highlight');
+  }
+
+  function replaceHighlighted(newChar) {
+    if (!highlightedSpan) return;
+    highlightedSpan.textContent = newChar;
+    highlightedSpan.classList.remove('highlight');
+    highlightedSpan = null;
+  }
+
+  copyViewerBtn.addEventListener('click', async () => {
+    let text = '';
+    viewer.querySelectorAll('span').forEach(span => text += span.textContent);
+    try {
+      await navigator.clipboard.writeText(text);
+      copyViewerBtn.textContent="Copied!";
+      setTimeout(()=>copyViewerBtn.textContent="Copy Text",1000);
+    } catch {
+      alert("Copy failed");
+    }
+  });
+</script>
+</body>
+</html>
