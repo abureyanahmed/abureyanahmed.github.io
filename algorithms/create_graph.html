@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Graph Editor</title>
+  <style>
+    body { font-family: Arial; }
+    svg { border: 1px solid black; }
+    .node { cursor: pointer; fill: lightblue; stroke: black; }
+    .edge { stroke: black; stroke-width: 2; }
+    .text-item { cursor: pointer; font-size: 14px; }
+    text { user-select: none; }
+  </style>
+</head>
+<body>
+
+<h3>Mode</h3>
+<label><input type="radio" name="mode" value="addNode" checked> Add Node</label>
+<label><input type="radio" name="mode" value="addEdge"> Add Edge</label>
+<label><input type="radio" name="mode" value="move"> Move</label>
+<label><input type="radio" name="mode" value="editLabel"> Modify Label</label>
+<label><input type="radio" name="mode" value="addText"> Add Text</label>
+
+<div id="edgeOptions" style="display:none;">
+  <h4>Edge Type</h4>
+  <label><input type="radio" name="edgeType" value="directed" checked> Directed</label>
+  <label><input type="radio" name="edgeType" value="undirected"> Undirected</label>
+</div>
+
+<br><br>
+
+<svg id="canvas" width="800" height="500"></svg>
+
+<script>
+const svg = document.getElementById("canvas");
+let nodes = [];
+let edges = [];
+let texts = [];
+let nodeId = 0;
+
+let selectedNode = null;
+let draggingItem = null;
+
+const modeRadios = document.getElementsByName("mode");
+const edgeOptions = document.getElementById("edgeOptions");
+
+modeRadios.forEach(r => {
+  r.addEventListener("change", () => {
+    edgeOptions.style.display = (getMode() === "addEdge") ? "block" : "none";
+  });
+});
+
+function getMode() {
+  return document.querySelector('input[name="mode"]:checked').value;
+}
+
+function getEdgeType() {
+  return document.querySelector('input[name="edgeType"]:checked').value;
+}
+
+// -------- Nodes --------
+function createNode(x, y) {
+  const id = nodeId++;
+  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+  const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  circle.setAttribute("cx", x);
+  circle.setAttribute("cy", y);
+  circle.setAttribute("r", 20);
+  circle.setAttribute("class", "node");
+
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", y + 5);
+  label.setAttribute("text-anchor", "middle");
+  label.textContent = "New Node";
+
+  group.appendChild(circle);
+  group.appendChild(label);
+  svg.appendChild(group);
+
+  const node = { type: "node", x, y, group, circle, label };
+  nodes.push(node);
+
+  group.addEventListener("mousedown", (e) => onItemMouseDown(e, node));
+  return node;
+}
+
+// -------- Text --------
+function createText(x, y) {
+  const textEl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  textEl.setAttribute("x", x);
+  textEl.setAttribute("y", y);
+  textEl.setAttribute("class", "text-item");
+  textEl.textContent = "New Text";
+
+  svg.appendChild(textEl);
+
+  const textObj = { type: "text", x, y, el: textEl };
+  texts.push(textObj);
+
+  textEl.addEventListener("mousedown", (e) => onItemMouseDown(e, textObj));
+}
+
+// -------- Edges --------
+function createEdge(n1, n2, directed) {
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("class", "edge");
+  svg.insertBefore(line, svg.firstChild);
+
+  const edge = { n1, n2, line, directed };
+  edges.push(edge);
+  updateEdge(edge);
+}
+
+function updateEdge(edge) {
+  const dx = edge.n2.x - edge.n1.x;
+  const dy = edge.n2.y - edge.n1.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  const r = 20;
+  const offsetX = (dx / dist) * r;
+  const offsetY = (dy / dist) * r;
+
+  const x1 = edge.n1.x + offsetX;
+  const y1 = edge.n1.y + offsetY;
+  const x2 = edge.n2.x - offsetX;
+  const y2 = edge.n2.y - offsetY;
+
+  edge.line.setAttribute("x1", x1);
+  edge.line.setAttribute("y1", y1);
+  edge.line.setAttribute("x2", x2);
+  edge.line.setAttribute("y2", y2);
+
+  if (edge.directed) {
+    edge.line.setAttribute("marker-end", "url(#arrow)");
+  } else {
+    edge.line.removeAttribute("marker-end");
+  }
+}
+
+function updateEdges(node) {
+  edges.forEach(e => {
+    if (e.n1 === node || e.n2 === node) updateEdge(e);
+  });
+}
+
+// -------- Interaction --------
+function onItemMouseDown(e, item) {
+  e.stopPropagation();
+  const mode = getMode();
+
+  if (mode === "addEdge" && item.type === "node") {
+    if (!selectedNode) {
+      selectedNode = item;
+    } else {
+      createEdge(selectedNode, item, getEdgeType() === "directed");
+      selectedNode = null;
+    }
+  }
+
+  if (mode === "move") {
+    draggingItem = item;
+  }
+
+  if (mode === "editLabel") {
+    const input = document.createElement("input");
+    input.value = item.type === "node" ? item.label.textContent : item.el.textContent;
+
+    input.style.position = "absolute";
+    input.style.left = e.pageX + "px";
+    input.style.top = e.pageY + "px";
+
+    document.body.appendChild(input);
+    input.focus();
+
+    input.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") {
+        if (item.type === "node") {
+          item.label.textContent = input.value;
+        } else {
+          item.el.textContent = input.value;
+        }
+        document.body.removeChild(input);
+      }
+    });
+  }
+}
+
+svg.addEventListener("click", (e) => {
+  const rect = svg.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  const mode = getMode();
+
+  if (mode === "addNode") createNode(x, y);
+  if (mode === "addText") createText(x, y);
+});
+
+svg.addEventListener("mousemove", (e) => {
+  if (!draggingItem) return;
+
+  const rect = svg.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  draggingItem.x = x;
+  draggingItem.y = y;
+
+  if (draggingItem.type === "node") {
+    draggingItem.circle.setAttribute("cx", x);
+    draggingItem.circle.setAttribute("cy", y);
+    draggingItem.label.setAttribute("x", x);
+    draggingItem.label.setAttribute("y", y + 5);
+    updateEdges(draggingItem);
+  } else {
+    draggingItem.el.setAttribute("x", x);
+    draggingItem.el.setAttribute("y", y);
+  }
+});
+
+svg.addEventListener("mouseup", () => {
+  draggingItem = null;
+});
+
+// -------- Arrow --------
+const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+
+marker.setAttribute("id", "arrow");
+marker.setAttribute("markerWidth", "8");
+marker.setAttribute("markerHeight", "8");
+marker.setAttribute("refX", "8");
+marker.setAttribute("refY", "3");
+marker.setAttribute("orient", "auto");
+
+const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+path.setAttribute("d", "M0,0 L8,3 L0,6 Z");
+path.setAttribute("fill", "black");
+
+marker.appendChild(path);
+defs.appendChild(marker);
+svg.appendChild(defs);
+</script>
+
+</body>
+</html>
