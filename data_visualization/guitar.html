@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Custom Guitar Generator</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #111;
+        color: white;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+    }
+
+    .controls {
+        display: grid;
+        grid-template-columns: repeat(2, 220px);
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: flex;
+        flex-direction: column;
+        font-size: 14px;
+    }
+
+    input, select {
+        margin-top: 5px;
+        padding: 8px;
+        border-radius: 6px;
+        border: none;
+    }
+
+    canvas {
+        background: #222;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        background: #ff5722;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background: #ff784e;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Custom Guitar Generator</h1>
+
+<div class="controls">
+
+    <label>
+        Body Color
+        <input type="color" id="bodyColor" value="#cc0000">
+    </label>
+
+    <label>
+        Neck Color
+        <input type="color" id="neckColor" value="#c49a6c">
+    </label>
+
+    <label>
+        Guitar Style
+        <select id="guitarStyle">
+            <option value="strat">Stratocaster</option>
+            <option value="lespaul">Les Paul</option>
+            <option value="flyingv">Flying V</option>
+        </select>
+    </label>
+
+    <label>
+        Pickguard
+        <select id="pickguard">
+            <option value="white">White</option>
+            <option value="black">Black</option>
+            <option value="none">None</option>
+        </select>
+    </label>
+
+</div>
+
+<button onclick="drawGuitar()">Draw Guitar</button>
+
+<canvas id="guitarCanvas" width="700" height="500"></canvas>
+
+<script>
+const canvas = document.getElementById("guitarCanvas");
+const ctx = canvas.getContext("2d");
+
+function drawGuitar() {
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const bodyColor = document.getElementById("bodyColor").value;
+    const neckColor = document.getElementById("neckColor").value;
+    const style = document.getElementById("guitarStyle").value;
+    const pickguard = document.getElementById("pickguard").value;
+
+    // Neck
+    ctx.fillStyle = neckColor;
+    ctx.fillRect(320, 60, 60, 250);
+
+    // Frets
+    ctx.strokeStyle = "#888";
+    for(let i = 0; i < 12; i++) {
+        ctx.beginPath();
+        ctx.moveTo(320, 80 + i * 18);
+        ctx.lineTo(380, 80 + i * 18);
+        ctx.stroke();
+    }
+
+    // Headstock
+    ctx.fillStyle = neckColor;
+    ctx.fillRect(300, 20, 100, 50);
+
+    // Strings
+    ctx.strokeStyle = "#ddd";
+    for(let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.moveTo(325 + i * 10, 20);
+        ctx.lineTo(325 + i * 10, 430);
+        ctx.stroke();
+    }
+
+    // Body styles
+    ctx.fillStyle = bodyColor;
+
+    if(style === "strat") {
+        drawStrat();
+    }
+    else if(style === "lespaul") {
+        drawLesPaul();
+    }
+    else if(style === "flyingv") {
+        drawFlyingV();
+    }
+
+    // Pickguard
+    if(pickguard !== "none") {
+        ctx.fillStyle = pickguard;
+
+        ctx.beginPath();
+        ctx.ellipse(350, 350, 50, 80, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function drawStrat() {
+    ctx.beginPath();
+
+    ctx.moveTo(240, 260);
+    ctx.bezierCurveTo(180, 250, 160, 420, 280, 450);
+
+    ctx.lineTo(430, 450);
+
+    ctx.bezierCurveTo(550, 420, 520, 250, 460, 260);
+
+    ctx.bezierCurveTo(520, 170, 440, 130, 380, 170);
+
+    ctx.lineTo(320, 170);
+
+    ctx.bezierCurveTo(250, 120, 180, 180, 240, 260);
+
+    ctx.fill();
+}
+
+function drawLesPaul() {
+    ctx.beginPath();
+
+    ctx.roundRect(220, 180, 260, 280, 80);
+
+    ctx.fill();
+}
+
+function drawFlyingV() {
+    ctx.beginPath();
+
+    ctx.moveTo(350, 180);
+    ctx.lineTo(180, 450);
+    ctx.lineTo(300, 450);
+
+    ctx.lineTo(350, 330);
+
+    ctx.lineTo(400, 450);
+
+    ctx.lineTo(520, 450);
+
+    ctx.closePath();
+
+    ctx.fill();
+}
+
+// Initial draw
+drawGuitar();
+</script>
+
+</body>
+</html>
