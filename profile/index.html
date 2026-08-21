@@ -61,7 +61,22 @@ nav {
 
 <div class="row">
   <div class="column2">
-    <img src="reyan2.jpeg" width="150">
+    <img id="myImage" src="" width="150">
+    <script>
+        const images = [
+            "reyan2.jpeg",
+            "IMG-20260818-WA0003.jpg"
+        ];
+    
+        // Current timestamp in milliseconds
+        const timestamp = Date.now();
+    
+        // Generate 0 or 1 based on the timestamp
+        const randomIndex = timestamp % images.length;
+    
+        // Pick the image
+        document.getElementById("myImage").src = images[randomIndex];
+    </script>
   </div>
   <div class="column">
     <h1>Reyan Ahmed</h1>
